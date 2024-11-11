@@ -1,0 +1,39 @@
+#server:
+#  port: 8888
+
+
+spring:
+  thymeleaf:
+    cache: false
+    encoding: UTF-8
+  datasource:
+    druid:
+      url: jdbc:mysql://localhost:3306/graduation_301_mzmall?useSSL=false&serverTimezone=Asia/Shanghai&autoReconnect=true&characterEncoding=UTF-8
+      username: root
+      password: 123456
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      initial-size: 10
+      max-active: 15
+      min-idle: 8
+      max-wait: 10
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 15MB
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+mybatis-plus:
+  configuration:
+    #在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: AUTO
+      update-strategy: not_empty
+  mapper-locations: classpath:mapper/*.xml

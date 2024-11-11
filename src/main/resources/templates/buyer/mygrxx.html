@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="utf-8"/>
+    <title>东方学院二手美妆商场</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/public.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/mygrxx.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/layui/lib/layui-v2.6.3/css/layui.css}"/>
+</head>
+<body>
+<!------------------------------head------------------------------>
+<div class="head" th:replace="buyer/common :: headerforuserinfo"></div>
+<!------------------------------idea------------------------------>
+<div class="address">
+    <div class="wrapper clearfix">
+        <a th:href="@{/mzmall/index.html}" class="fl">首页</a>
+        <span>/</span>
+        <a href="#" class="on">个人信息</a>
+    </div>
+</div><!------------------------------Bott------------------------------>
+<div class="Bott">
+    <div class="wrapper clearfix">
+        <div class="zuo fl" th:replace="buyer/common :: infoLeftMenu"></div>
+        <div class="you fl">
+            <h2>个人信息</h2>
+            <div class="gxin">
+                <div class="tx" style="margin-top: 0">
+                    <a href="#">
+                        <img style="width: 92px; height: 92px; border-radius: 46px;" th:src="@{'/mzmall/img/avatar/' + ${session.user.avatar}}"/>
+                    <p id="avatar">修改头像</p>
+                    </a>
+                </div>
+                <div class="xx">
+                    <h3 class="clearfix">
+                        <strong class="fl">基础资料</strong>
+                        <a href="#" class="fr" id="edit1">编辑</a>
+                </h3>
+                    <div th:text="'昵称：' + ${session.user.username}"></div>
+                    <div th:text="'姓名：' + ${session.user.name}"></div>
+                    <div th:text="'邮箱：' + ${session.user.email!=null?session.user.email:'暂无邮箱'}"></div>
+                    <div th:text="'电话：' + ${session.user.phone}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!--遮罩-->
+<div class="mask"></div>
+<!--编辑弹框-->
+<div class="bj">
+    <div class="clearfix">
+        <a href="#" class="fr gb">
+            <img th:src="@{/staticRes/front/img/icon4.png}"/>
+        </a>
+    </div>
+    <h3>编辑基础资料</h3>
+    <form>
+        <input type="text" th:value="${session.user.userId}" hidden name="userId" id="userId"/>
+        <p><label>姓名：</label><input style="width: 252px; height: 42px;" type="text" id="userName" name="name" th:value="${session.user.name}"/></p>
+        <p><label>邮箱：</label><input style="width: 252px; height: 42px;" type="text" id="userEmail" name="email" th:value="${session.user.email}"/></p>
+        <p style="height: 42px;"><label>电话：</label><input style="width: 252px; height: 42px;" type="text" id="userPhone" name="phone" th:value="${session.user.phone}"/></p>
+        <div class="bc">
+            <input type="submit" id="updateinfo" value="保存"/>
+            <input type="button" value="取消"/>
+        </div>
+    </form>
+</div>
+<!--高级设置修改-->
+<!--修改头像-->
+<div class="avatar">
+    <div class="clearfix">
+        <a href="#" class="fr gb">
+            <img th:src="@{/staticRes/front/img/icon4.png}"/>
+        </a>
+    </div>
+    <h3>修改头像</h3>
+    <form th:action="@{/upload/avatar}" method="post" enctype="multipart/form-data">
+        <h4>请上传图片</h4>
+        <input id="upAvatarBtn" type="button" value="上传头像"/>
+        <p>jpg或png，大小不超过2M</p>
+        <input type="submit" value="提交"/>
+        <input style="opacity: 0; width: 0; height: 0;" type="file" id="upAvatarInput" name="file" />
+    </form>
+</div>
+<!--返回顶部-->
+<div class="gotop" th:replace="buyer/common :: rightTool"></div>
+<!--footer-->
+<div class="footer" th:replace="buyer/common :: footer"></div>
+
+
+<script th:src="@{/staticRes/front/js/jquery-1.12.4.min.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/layui/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/public.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/user.js}" type="text/javascript" charset="utf-8"></script>
+
+<script th:inline="javascript">
+    let contextPath = [[@{/}]];
+
+    $('#upAvatarBtn').click(function () {
+        $('#upAvatarInput').click()
+    });
+
+    $("#updateinfo").click(function () {
+        $("#updateinfo").attr("disabled", "disabled");
+        let userId = $("#userId").val();
+        let name = $("#userName").val();
+        let phone = $("#userPhone").val();
+        let email = $("#userEmail").val();
+        console.log(userId, name, phone, email)
+        if (name == ""){
+            layui.layer.msg("姓名不能为空",{icon:2,time:1500});
+            $("#updateinfo").attr("disabled",false);
+            return false;
+        }
+        if (phone == ""){
+            layui.layer.msg("电话不能为空",{icon:2,time:1500});
+            $("#updateinfo").attr("disabled",false);
+            return false;
+        }
+        let ph = /^1[3|4|5|7|8]\d{9}$/;
+        if (ph.test(phone) === false){
+            layui.layer.msg("手机号不合法",{icon:2,time:1500});
+            $("#updateinfo").attr("disabled",false);
+            return false;
+        }
+        if (email == ""){
+            layui.layer.msg("邮箱不能为空",{icon:2,time:1500});
+            $("#updateinfo").attr("disabled",false);
+            return false;
+        }
+        let atpos = email.indexOf("@");
+        let dotpos = email.lastIndexOf(".");
+        if (atpos<1 || dotpos<atpos+2 || dotpos+2>=email.length){
+            layui.layer.msg("邮箱不合法",{icon:2,time:1500});
+            $("#updateinfo").attr("disabled",false);
+            return false;
+        }
+        $.ajax({
+            url: contextPath+"mzmall/user/updateinfo",
+            type: "post",
+            data: {
+                userId: userId,
+                name: name,
+                phone: phone,
+                email: email
+            },
+            resultType: "json",
+            success: function (response) {
+                if (response.code === 0){
+                    layui.layer.msg("信息修改成功",{icon:1,time:1500});
+                    window.location.href="http://localhost:8080/mzmall/touserinfo";
+                }else {
+                    layui.layer.msg(response.msg,{icon:2,time:1500});
+                    $("#updateinfo").attr("disabled",false);
+                }
+            }
+        });
+        return false;
+    });
+
+    $('#logoutBtn').click(function () {
+        $("#logoutBtn").attr("disabled", "disabled");
+        $.ajax({
+            url: contextPath+"mzmall/user/logout",
+            type: "post",
+            resultType: "json",
+            success: function (response) {
+                if (response.code === 0){
+                    window.location.href="http://localhost:8080/mzmall/login";
+                }else {
+                    layui.layer.msg(response.msg,{icon:2,time:1500});
+                    $("#logoutBtn").attr("disabled",false);
+                }
+            }
+        });
+    })
+</script>
+</body>
+</html>

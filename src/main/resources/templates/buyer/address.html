@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="utf-8"/>
+    <title>东方学院二手美妆商场</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/public.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/mygxin.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/layui/lib/layui-v2.6.3/css/layui.css}"/>
+    <style>
+        .addp {
+            width: 244px;
+            height: 20px;
+        }
+        .addp a{
+            margin: 0 !important;
+        }
+    </style>
+</head>
+<body><!------------------------------head------------------------------>
+<div class="head ding" th:replace="buyer/common :: headerforuserinfo"></div>
+<!------------------------------idea------------------------------>
+<div class="address">
+    <div class="wrapper clearfix">
+        <a th:href="@{/mzmall/index.html}" class="fl">首页</a>
+        <span>/</span>
+        <a href="#" class="on">地址管理</a>
+    </div>
+</div>
+<!------------------------------Bott------------------------------>
+<div class="Bott">
+    <div class="wrapper clearfix">
+        <div class="zuo fl" th:replace="buyer/common :: infoLeftMenu"></div>
+        <div class="you fl">
+            <h2>收货地址</h2>
+            <div class="add" style="display: flex; justify-content: left;" >
+                <div th:if="${session.user.address==''}">
+                    <a href="#2" id="addxad">
+                        <img th:src="@{/staticRes/front/img/jia.png}"/>
+                    </a>
+                    <span>添加新地址</span>
+                </div>
+                <div th:if="${session.user.address != ''}" id="dizhi" style="display: inline; text-align: left; padding: 20px 0 0 20px;">
+                    <p th:text=" '姓名：' + ${session.user.name}"></p>
+                    <p style="height: 24px;" th:text="'手机：' + ${session.user.phone}">1573****666</p>
+                    <p style="height: 24px;" th:text="'地址：' + ${session.user.address}"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!--编辑弹框--><!--遮罩-->
+<div class="mask"></div>
+<div class="adddz">
+    <h3 style="margin-bottom: 12px; text-align: center;">添加地址</h3>
+    <form>
+        <input type="text" name="userName" placeholder="姓名" id="addUserName" value=""/>
+        <input type="text" name="phone" placeholder="电话" id="addPhone" value=""/>
+        <textarea name="userAddress" id="addUserAddress" rows="" cols="" placeholder="详细地址" value=""></textarea>
+        <div class="bc">
+            <input type="button" id="addSubBtn" value="保存"/>
+            <input type="button" value="取消"/>
+        </div>
+    </form>
+</div>
+<div class="readd">
+    <h3 style="margin-bottom: 12px; text-align: center;">修改地址</h3>
+    <form>
+        <input type="text" name="userName" id="userName" th:value="${session.user.name!=''?session.user.name:'暂无姓名'}"/>
+        <input type="text" name="phone" id="phone" th:value="${session.user.phone!=''?session.user.phone:'暂无联系方式'}"/>
+        <textarea name="userAddress" id="userAddress" rows="" cols="" placeholder="详细地址" th:value="${session.user.address}"></textarea>
+        <div class="bc">
+            <input type="button" id="subBtn" value="保存"/>
+            <input type="button" value="取消"/>
+        </div>
+    </form>
+</div>
+<!--返回顶部-->
+<div class="gotop" th:replace="buyer/common :: rightTool"></div>
+<!--footer-->
+<div class="footer" th:replace="buyer/common :: footer"></div>
+
+
+<script th:src="@{/staticRes/front/js/jquery-1.12.4.min.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/layui/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/public.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/user.js}" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript" th:inline="javascript">
+    let contextPath = [[@{/}]];
+
+    $('#logoutBtn').click(function () {
+        $("#logoutBtn").attr("disabled", "disabled");
+        $.ajax({
+            url: contextPath+"mzmall/user/logout",
+            type: "post",
+            resultType: "json",
+            success: function (response) {
+                if (response.code === 0){
+                    window.location.href="http://localhost:8080/mzmall/login";
+                }else {
+                    layui.layer.msg(response.msg,{icon:2,time:1500});
+                    $("#logoutBtn").attr("disabled",false);
+                }
+            }
+        });
+    });
+
+
+    let subBtnIsClick = true;
+    $('#subBtn').click(function(){
+        if (!subBtnIsClick) {
+            return
+        }
+        subBtnIsClick = false
+
+        let userName = $('#userName').val()
+        let phone = $('#phone').val()
+        let userAddress = $('#userAddress').val()
+        $("#subBtn").attr("disabled", "disabled")
+        // console.log(userName, phone, userAddress)
+        if (userName == '') {
+            layui.layer.msg("姓名不能为空",{icon:2,time:1500});
+            $("#subBtn").attr("disabled",false);
+            subBtnIsClick = true
+            return false
+        }
+        if (phone == '') {
+            layui.layer.msg("联系方式不能为空",{icon:2,time:1500});
+            $("#subBtn").attr("disabled",false);
+            subBtnIsClick = true
+            return false
+        }
+        let ph = /^1[3|4|5|7|8]\d{9}$/;
+        if (ph.test(phone) === false){
+            layui.layer.msg("手机号不合法",{icon:2,time:1500});
+            $("#subBtn").attr("disabled",false);
+            subBtnIsClick = true
+            return false;
+        }
+        if (userAddress == '') {
+            layui.layer.msg("收货地址不能为空",{icon:2,time:1500});
+            $("#subBtn").attr("disabled",false);
+            subBtnIsClick = true
+            return false;
+        }
+        $.ajax({
+            url: contextPath+"mzmall/user/updateAddress",
+            type: "post",
+            data: {
+              name: userName,
+              phone: phone,
+              address: userAddress
+            },
+            resultType: "json",
+            success: function (response) {
+                console.log(response)
+                if (response.code === 0){
+                    // 成功就返回到地址管理页面
+                    window.location.href="http://localhost:8080/mzmall/address.html";
+                }else {
+                    layui.layer.msg(response.msg, {icon:2,time:1500});
+                }
+                subBtnIsClick = true
+            }
+        });
+    });
+
+
+    let addSubBtnIsClick = true
+    $('#addSubBtn').click(function(){
+        if (!addSubBtnIsClick) {
+            return
+        }
+        addSubBtnIsClick = false
+        let userName = $('#addUserName').val()
+        let phone = $('#addPhone').val()
+        let userAddress = $('#addUserAddress').val()
+        $("#addSubBtn").attr("disabled", "disabled")
+        // console.log(userName, phone, userAddress)
+        if (userName == '') {
+            layui.layer.msg("姓名不能为空",{icon:2,time:1500});
+            $("#addSubBtn").attr("disabled",false);
+            buyNowIsClick = true
+            return false
+        }
+        if (phone == '') {
+            layui.layer.msg("联系方式不能为空",{icon:2,time:1500});
+            $("#addSubBtn").attr("disabled",false);
+            buyNowIsClick = true
+            return false
+        }
+        let ph = /^1[3|4|5|7|8]\d{9}$/;
+        if (ph.test(phone) === false){
+            layui.layer.msg("手机号不合法",{icon:2,time:1500});
+            $("#addSubBtn").attr("disabled",false);
+            buyNowIsClick = true
+            return false;
+        }
+        if (userAddress == '') {
+            layui.layer.msg("收货地址不能为空",{icon:2,time:1500});
+            $("#addSubBtn").attr("disabled",false);
+            buyNowIsClick = true
+            return false;
+        }
+        // 因为当前数据库没有对用户的地址进行分表 添加地址就相当于修改地址
+        $.ajax({
+            url: contextPath+"mzmall/user/updateAddress",
+            type: "post",
+            data: {
+                name: userName,
+                phone: phone,
+                address: userAddress
+            },
+            resultType: "json",
+            success: function (response) {
+                console.log(response)
+                if (response.code === 0){
+                    // 成功就返回到地址管理页面
+                    window.location.href="http://localhost:8080/mzmall/address.html";
+                }else {
+                    layui.layer.msg(response.msg, {icon:2,time:1500});
+                }
+                buyNowIsClick = true
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="utf-8"/>
+    <title>东方学院二手美妆商场</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/public.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/index.css}"/>
+</head>
+<body>
+<!------------------------------head------------------------------>
+<div class="head" th:replace="buyer/common :: header"></div>
+<!-------------------------banner--------------------------->
+<div class="block_home_slider">
+    <div id="home_slider" class="flexslider">
+        <ul class="slides">
+            <li>
+                <div class="slide"><img th:src="@{/staticRes/front/img/banner2.jpg}"/></div>
+            </li>
+            <li>
+                <div class="slide"><img th:src="@{/staticRes/front/img/banner1.jpg}"/></div>
+            </li>
+            <li>
+                <div class="slide"><img th:src="@{/staticRes/front/img/banner3.jpg}"/></div>
+            </li>
+        </ul>
+    </div>
+</div>
+<!------------------------------people------------------------------>
+<div class="people">
+    <div class="wrapper">
+        <h2 style="font-size: 28px; text-align: center; margin-bottom: 10px">精品推荐</h2>
+        <div class="pList clearfix tran" th:each="goodsList : ${recommendGoods}">
+            <a th:each="goods : ${goodsList}" th:href="@{'/mzmall/detail?goodsid=' + ${goods.goodsId}}">
+                <dl>
+                    <dt>
+                        <span class="abl"></span>
+                        <img style="width: 350px; height: 350px;" th:src="@{'/mzmall/img/cover/' + ${goods.cover}}"/>
+                        <span class="abr"></span>
+                    </dt>
+                    <dd th:text="${goods.goodsName}"></dd>
+                    <dd><span th:text="'￥' + ${goods.price}"></span></dd>
+                </dl>
+            </a>
+        </div>
+    </div>
+    <div class="wrapper">
+        <h2 style="font-size: 28px; text-align: center; margin-bottom: 10px">猜你喜欢</h2>
+        <div class="pList clearfix tran" th:each="goodsList : ${guessYouWillLikeGoods}">
+            <a th:each="goods : ${goodsList}" th:href="@{'/mzmall/detail?goodsid=' + ${goods.goodsId}}">
+                <dl>
+                    <dt>
+                        <span class="abl"></span>
+                        <img style="width: 350px; height: 350px;" th:src="@{'/mzmall/img/cover/' + ${goods.cover}}"/>
+                        <span class="abr"></span>
+                    </dt>
+                    <dd th:text="${goods.goodsName}"></dd>
+                    <dd><span th:text="'￥' + ${goods.price}"></span></dd>
+                </dl>
+            </a>
+        </div>
+    </div>
+</div>
+<!--返回顶部-->
+<div class="gotop" th:replace="buyer/common :: rightTool">
+</div>
+<!-------------------login-------------------------->
+<!--footer-->
+<div class="footer" th:replace="buyer/common :: footer">
+
+</div>
+
+
+<script th:src="@{/staticRes/front/js/jquery-1.12.4.min.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/public.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/nav.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/jquery.flexslider-min.js}" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+    $(function () {
+    $('#home_slider').flexslider({
+        animation: 'slide',
+        controlNav: true,
+        directionNav: false,
+        animationLoop: true,
+        slideshow: true,
+        slideshowSpeed: 2000,
+        useCSS: false
+    });
+});</script>
+</body>
+</html>

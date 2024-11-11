@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<div class="head" th:fragment="header">
+    <div class="wrapper clearfix">
+        <div class="clearfix" id="top">
+            <h1 class="fl">
+                东方学院二手美妆商场
+            </h1>
+            <div class="fr clearfix" id="top1">
+                <p class="fl" th:if="${session.user == null}">
+                    <a th:href="@{/mzmall/login.html}" id="login">登录</a>
+                    <a th:href="@{/mzmall/reg.html}" id="reg">注册</a>
+                </p>
+                <form th:action="@{/mzmall/search}" method="get" class="fl">
+                    <input name="searchKey" type="text" placeholder="搜索"/>
+                    <input value="" type="submit"/>
+                </form>
+                <p class="fl" th:if="${session.user != null}">
+                    你好！[[${session.user.username}]]
+                </p>
+                <div class="btn fl clearfix">
+                    <a th:href="@{/mzmall/touserinfo}">
+                        <img th:src="@{/staticRes/front/img/grzx.png}"/>
+                    </a>
+                    <a th:href="@{/mzmall/tocart}">
+                        <img th:src="@{/staticRes/front/img/gwc.png}"/>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <ul class="clearfix" id="bott">
+            <li><a th:href="@{/mzmall/index.html}">首页</a></li>
+            <li>
+                <a href="#">所有商品</a>
+                <div class="sList2"  style="top: 95px; height: 130px;">
+                    <div class="clearfix">
+                        <a th:each="category : ${session.allCategory}" th:href="@{'/mzmall/searchbycategory/' + ${category.categoryId}}" th:text="${category.categoryName}"></a>
+                    </div>
+                </div>
+            </li>
+            <li th:each="category : ${session.topCategory}">
+                <a th:href="@{'/mzmall/searchbycategory/' + ${category.categoryId}}" th:text="${category.categoryName}"></a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="head" th:fragment="headerforuserinfo">
+    <div class="wrapper clearfix">
+        <div class="clearfix" id="top">
+            <h1 class="fl">
+                东方学院二手美妆商场
+            </h1>
+        </div>
+        <ul class="clearfix" id="bott">
+            <li><a th:href="@{/mzmall/index.html}">首页</a></li>
+            <li>
+                <a href="#">所有商品</a>
+                <div class="sList2"  style="top: 80px; height: 130px;">
+                    <div class="clearfix">
+                        <a th:each="category : ${session.allCategory}" th:href="@{'/mzmall/searchbycategory/' + ${category.categoryId}}" th:text="${category.categoryName}"></a>
+                    </div>
+                </div>
+            </li>
+            <li th:each="category : ${session.topCategory}">
+                <a th:href="@{'/mzmall/searchbycategory/' + ${category.categoryId}}" th:text="${category.categoryName}"></a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="gotop" th:fragment="rightTool">
+    <a th:href="@{/mzmall/tocart}">
+        <dl>
+            <dt><img th:src="@{/staticRes/front/img/gt1.png}"/></dt>
+            <dd>去购<br/>物车</dd>
+        </dl>
+    </a>
+    <a href="#" class="dh">
+        <dl>
+            <dt><img th:src="@{/staticRes/front/img/gt2.png}"/></dt>
+            <dd>联系<br/>客服</dd>
+        </dl>
+    </a>
+    <a th:href="@{/mzmall/touserinfo}">
+        <dl>
+            <dt><img th:src="@{/staticRes/front/img/gt3.png}"/></dt>
+            <dd>个人<br/>中心</dd>
+        </dl>
+    </a>
+    <a href="#" class="toptop" style="display: none">
+        <dl>
+            <dt><img th:src="@{/staticRes/front/img/gt4.png}"/></dt>
+            <dd>返回<br/>顶部</dd>
+        </dl>
+    </a>
+    <p>400-800-8200</p>
+</div>
+
+
+<div class="footer" th:fragment="footer">
+    <div class="top">
+        <div class="wrapper">
+            <div class="clearfix"><a href="#2" class="fl"><img th:src="@{/staticRes/front/img/foot1.png}"/></a><span class="fl">7天无理由退货</span>
+            </div>
+            <div class="clearfix"><a href="#2" class="fl"><img th:src="@{/staticRes/front/img/foot2.png}"/></a><span class="fl">15天免费换货</span>
+            </div>
+            <div class="clearfix"><a href="#2" class="fl"><img th:src="@{/staticRes/front/img/foot3.png}"/></a><span class="fl">满599包邮</span>
+            </div>
+            <div class="clearfix"><a href="#2" class="fl"><img th:src="@{/staticRes/front/img/foot4.png}"/></a><span class="fl">手机特色服务</span>
+            </div>
+        </div>
+    </div>
+    <p class="dibu">
+        MZMALL&copy;2013-2017公司版权所有 京ICP备080100-44备0000111000号<br/>
+        违法和不良信息举报电话：400-800-8200
+    </p>
+</div>
+
+<div class="zuo fl" th:fragment="infoLeftMenu">
+    <h3>
+        <a href="#">
+            <img style="width: 92px; height: 92px; border-radius: 46px;" th:src="@{'/mzmall/img/avatar/' + ${session.user.avatar}}"/>
+        </a>
+        <p class="clearfix">
+            <span class="fl" th:text="'[' + ${session.user.username} + ']'"></span>
+            <span class="fr" id="logoutBtn">[退出登录]</span>
+        </p>
+    </h3>
+    <div>
+        <h4 style="font-weight: bold;">我的交易</h4>
+        <ul>
+            <li><a th:href="@{/mzmall/tocart}">我的购物车</a></li>
+            <li><a th:href="@{/mzmall/myorder}">我的订单</a></li>
+            <li><a th:href="myprod.html">评价晒单</a></li>
+        </ul>
+        <h4 style="font-weight: bold;">个人中心</h4>
+        <ul>
+            <li><a th:href="@{/mzmall/address.html}">地址管理</a></li>
+            <li th:if="${session.user.role == 0}"><a th:href="@{/seller/reg.html}">商家注册</a></li>
+            <li th:if="${session.user.role == 1}"><a th:href="@{/seller/index.html}">商家主页</a></li>
+        </ul>
+        <h4 style="font-weight: bold;">账户管理</h4>
+        <ul>
+            <li><a th:href="@{/mzmall/touserinfo}">个人信息</a></li>
+            <li><a th:href="@{/mzmall/toupdatepassword}">修改密码</a></li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>

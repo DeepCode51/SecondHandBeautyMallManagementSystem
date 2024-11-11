@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="utf-8"/>
+    <title>东方学院二手美妆商场</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/public.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/myorder.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/layui/lib/layui-v2.6.3/css/layui.css}"/>
+    <style>
+        .ggtt{
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+<!------------------------------head------------------------------>
+<div class="head ding" th:replace="buyer/common :: headerforuserinfo"></div>
+<!------------------------------idea------------------------------>
+<div class="address">
+    <div class="wrapper clearfix">
+        <a th:href="@{/mzmall/index.html}" class="fl">首页</a>
+        <span>/</span>
+        <a th:href="@{/mzmall/myorder}" class="on">我的订单</a>
+        <span>/</span>
+        <a href="#" class="on">订单详情</a>
+    </div>
+</div><!------------------------------Bott------------------------------>
+<div class="Bott">
+    <div class="wrapper clearfix">
+        <div class="zuo fl" th:replace="buyer/common :: infoLeftMenu"></div>
+        <div class="you fl">
+            <div class="my clearfix"><h2>订单详情</h2>
+                <h3>订单号：<span th:text="${orderDetailVo.orderId}">54163846846848468</span></h3></div>
+            <div class="orderList">
+                <div class="orderList1">
+                    <h3 th:text="${orderDetailVo.orderStatusStr}">已收货</h3>
+                    <div class="clearfix ggtt" th:each="item : ${orderDetailVo.list}">
+                        <a th:href="@{'/mzmall/detail?goodsid=' + ${item.goodsId}}" class="fl">
+                            <img style="width: 65px; height: 65px;" th:src="@{'/mzmall/img/cover/' + ${item.goodsCover}}"/>
+                        </a>
+                        <p class="fl"><a href="#" th:text="${item.goodsName}">家用创意菜盘子圆盘 釉下彩复古</a>
+                            <a href="#" th:text="'¥' + ${item.price} + 'x' + ${item.goodsCount}">¥99.00×1</a></p>
+                    </div>
+                </div>
+                <div class="orderList1"><h3>收货信息</h3>
+                    <p>姓 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名：<span th:text="${orderDetailVo.deliveryName}">杨小黄</span></p>
+                    <p>联系电话：<span th:text="${orderDetailVo.deliveryPhone}">157*****121</span></p>
+                    <p>收货地址：<span th:text="${orderDetailVo.deliveryAddress}"></span></p></div>
+                <div class="orderList1"><h3>支付方式及送货时间</h3>
+                    <p>支付方式：<span>在线支付</span></p>
+                    <p>送货时间：<span>不限送货时间</span></p></div>
+                <div class="orderList1 hei"><h3><strong>商品总价：</strong><span th:text="'¥'+${orderDetailVo.totalAmount}">¥99</span></h3>
+<!--                    <p><strong>运费：</strong><span>¥0</span></p>-->
+                    <p><strong>订单金额：</strong><span th:text="'¥'+${orderDetailVo.totalAmount}">¥99</span></p>
+                    <p><strong>实付金额：</strong><span th:text="'¥'+${orderDetailVo.totalAmount}">¥99</span></p></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--返回顶部-->
+<div class="gotop" th:replace="buyer/common :: rightTool"></div>
+<!--footer-->
+<div class="footer" th:replace="buyer/common :: footer"></div>
+
+
+<script th:src="@{/staticRes/front/js/jquery-1.12.4.min.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/layui/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/public.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/user.js}" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript" th:inline="javascript">
+    let contextPath = [[@{/}]];
+
+    $('#logoutBtn').click(function () {
+        $("#logoutBtn").attr("disabled", "disabled");
+        $.ajax({
+            url: contextPath+"mzmall/user/logout",
+            type: "post",
+            resultType: "json",
+            success: function (response) {
+                if (response.code === 0){
+                    window.location.href="http://localhost:8080/mzmall/login";
+                }else {
+                    layui.layer.msg(response.msg,{icon:2,time:1500});
+                    $("#logoutBtn").attr("disabled",false);
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

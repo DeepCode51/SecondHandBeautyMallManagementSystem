@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="utf-8"/>
+    <title>东方学院二手美妆商场</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/public.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/proList.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/layui/lib/layui-v2.6.3/css/layui.css}"/>
+    <style>
+        .ttyy {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+<!--------------------------------------cart--------------------->
+<div class="head ding" th:replace="buyer/common :: headerforuserinfo"></div>
+<div class="cart">
+    <!-----------------logo------------------->
+    <!--<div class="logo"><h1 class="wrapper clearfix"><a href="index.html"><img class="fl" src="img/temp/logo.png"></a><img class="top" src="img/temp/cartTop01.png"></h1></div>-->
+    <!-----------------site------------------->
+    <div class="site">
+        <p class=" wrapper clearfix">
+            <span class="fl">购物车</span>
+            <a th:href="@{/mzmall/index.html}" class="fr">继续购物&gt;</a>
+        </p>
+    </div>
+    <!-----------------table------------------->
+    <div class="table wrapper">
+        <div class="tr">
+            <div>商品</div>
+            <div>单价</div>
+            <div>数量</div>
+            <div>小计</div>
+            <div>操作</div>
+        </div>
+        <div class="th" th:each="item : ${cartInfo}">
+            <div class="pro clearfix">
+                <label class="fl">
+                    <input th:value="${item.cartId}" type="checkbox"/>
+                    <span></span>
+                </label>
+                <a class="fl" href="#">
+                    <dl class="clearfix">
+                        <dt class="fl"><img style="width: 120px; height: 120px" th:src="@{'/mzmall/img/cover/' + ${item.cover}}"></dt>
+                        <dd class="fl">
+                            <p class="ttyy" th:text="${item.goodsName}"></p>
+                            <p>描述:</p>
+                            <p class="ttyy" th:text="${item.goodDesc}"></p></dd>
+                    </dl>
+                </a>
+            </div>
+            <div class="price" th:text="'￥' + ${item.price}">￥20.00</div>
+            <div class="number">
+                <p class="num clearfix">
+                    <img class="fl sub" th:src="@{/staticRes/front/img/temp/sub.jpg}">
+                    <span th:attr="goodsStock=${item.stock}, cartId=${item.cartId}"  class="fl" th:text="${item.count}">1</span>
+                    <img class="fl add" th:src="@{/staticRes/front/img/temp/add.jpg}">
+                </p>
+            </div>
+            <div class="price sAll" th:text="'￥' + ${item.subtotal}">￥20.00</div>
+            <div class="price">
+                <a class="del" th:attr="cartId=${item.cartId}" href="#2">删除</a>
+            </div>
+        </div>
+        <div class="goOn">
+            空空如也~<a th:href="@{/mzmall/index.html}">去逛逛</a>
+        </div>
+        <div style="height: 500px;line-height: 500px;font-size: 16px;color: #666;text-align: center" th:if="${cartInfo.size() == 0}">
+            空空如也~<a th:href="@{/mzmall/index.html}">去逛逛</a>
+        </div>
+        <div class="tr clearfix">
+            <label class="fl">
+                <input class="checkAll" type="checkbox"/>
+                <span></span>
+            </label>
+            <p class="fl">
+                <a href="#">全选</a>
+                <a href="#" class="del">删除</a>
+            </p>
+            <p class="fr">
+                <span>共
+                    <small id="sl">0</small>
+                    件商品
+                </span>
+                <span>合计:&nbsp;
+                    <small id="all">
+                        ￥0.00
+                    </small>
+                </span>
+                <a href="#" class="count" id="settle">
+                    结算
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+<div class="mask"></div>
+<div class="tipDel">
+    <p>确定要删除该商品吗？</p>
+    <p class="clearfix">
+        <a class="fl cer" href="#">确定</a>
+        <a class="fr cancel" href="#">取消</a>
+    </p>
+</div>
+<!--返回顶部-->
+<div class="gotop" th:replace="buyer/common :: rightTool"></div>
+<!--footer-->
+<div class="footer" th:replace="buyer/common :: footer"></div>
+<!----------------mask------------------->
+<div class="mask"></div>
+<!-------------------mask内容------------------->
+<div class="pleaseC"><p>请选择宝贝</p><img class="off" th:src="@{/staticRes/front/img/temp/off.jpg}"/></div>
+
+
+<script th:src="@{/staticRes/front/js/jquery-1.12.4.min.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/layui/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/public.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/pro.js}" type="text/javascript" charset="utf-8"></script>
+<!-- <script src="js/cart.js" type="text/javascript" charset="utf-8"></script> -->
+
+<script type="text/javascript" th:inline="javascript">
+    let contextPath = [[@{/}]];
+
+
+
+    $(".num .sub").click(function () {
+        let c = parseInt($(this).siblings("span").text());
+        if (c <= 1) {
+            $(this).attr("disabled", "disabled")
+        } else {
+            c--;
+            // 获取购物车编号
+            let cartId = $(this).siblings("span").attr('cartId')
+            // 修改商品数量
+            $.ajax({
+                url: contextPath+"mzmall/user/updateCartGoodsCount",
+                type: "post",
+                data: {
+                    cartId: cartId,
+                    count: c
+                },
+                resultType: "json",
+                success: function (response) {
+                    console.log(response)
+                    if (response.code === 0){
+                    }else {
+                        layui.layer.msg(response.msg, {icon:2,time:1500});
+                    }
+                }
+            });
+            $(this).siblings("span").text(c);
+            let d = $(this).parents(".number").prev().text().substring(1);
+            $(this).parents(".th").find(".sAll").text("￥" + (c * d).toFixed(2));
+            a();
+            b()
+        }
+    });
+
+    $('.add').click(function(){
+        // 获取商品库存
+        let goodsStock = $(this).siblings("span").attr('goodsStock')
+        let c = parseInt($(this).siblings("span").text());
+        if(c >= goodsStock) {
+            layui.layer.msg('商品库存不足', {icon:2,time:1500});
+        }else {
+            c++;
+            // 获取购物车编号
+            let cartId = $(this).siblings("span").attr('cartId')
+            // 修改商品数量
+            $.ajax({
+                url: contextPath+"mzmall/user/updateCartGoodsCount",
+                type: "post",
+                data: {
+                    cartId: cartId,
+                    count: c
+                },
+                resultType: "json",
+                success: function (response) {
+                    console.log(response)
+                    if (response.code === 0){
+
+                    }else {
+                        layui.layer.msg(response.msg, {icon:2,time:1500});
+                    }
+                }
+            });
+            $(this).siblings("span").text(c);
+            var d = $(this).parents(".number").prev().text().substring(1);
+            $(this).parents(".th").find(".sAll").text("￥" + (c * d).toFixed(2));
+            a();
+            b()
+        }
+    })
+
+    $('#settle').click(function(){
+        // 获取所有选中的复选框 复选框的值为购物车的编号
+        let checkId = []
+        $("input[type='checkbox']:checked").each(function(i){
+            checkId[i] = $(this).val()
+        })
+        // 处理数组 是否有 ‘on’
+        let newCheck = []
+        for (let i = 0; i < checkId.length; i++) {
+            if (checkId[i] != 'on') {
+                newCheck.push(checkId[i])
+            }
+        }
+        console.log(newCheck)
+        // 判断数组长度是否为0
+        // 如果是那么就提示用户选商品
+        if(newCheck.length === 0) {
+            layui.layer.msg('请选择商品', {icon:2,time:1500});
+            return
+        }
+        console.log(newCheck)
+        // 如果不是就跳转到订单页面
+        // 可以生成一个订单 然后返回订单编号 成功跳转到订单页面
+        let cartIdsStr = newCheck.join(",")
+        $.ajax({
+            url: contextPath+"mzmall/user/createNewOrder/" + cartIdsStr,
+            type: "post",
+            resultType: "json",
+            success: function (response) {
+                console.log(response)
+                if (response.code === 0){
+                    let data = response.data
+                    let str = data.join(",")
+                    window.location.href="http://localhost:8080/mzmall/topay/"+str;
+                }else {
+                    layui.layer.msg(response.msg, {icon:2,time:1500});
+                }
+            }
+        });
+    })
+
+
+    function a() {
+        var c = 0;
+        var d = $(".th input[type='checkbox']:checked").length;
+        if (d == 0) {
+            $("#all").text("￥" + parseFloat(0).toFixed(2))
+        } else {
+            $(".th input[type='checkbox']:checked").each(function () {
+                var e = $(this).parents(".pro").siblings(".sAll").text().substring(1);
+                c += parseFloat(e);
+                $("#all").text("￥" + c.toFixed(2))
+            })
+        }
+    }
+
+    function b() {
+        var e = 0;
+        var c = $(".th input[type='checkbox']:checked").parents(".th").find(".num span");
+        var d = c.length;
+        if (d == 0) {
+            $("#sl").text(0)
+        } else {
+            c.each(function () {
+                e += parseInt($(this).text());
+                $("#sl").text(e)
+            })
+        }
+        if ($("#sl").text() > 0) {
+            $(".count").css("background", "#c10000")
+        } else {
+            $(".count").css("background", "#8e8e8e")
+        }
+    }
+
+    $("input[type='checkbox']").on("click", function () {
+        var f = $(this).is(":checked");
+        var e = $(this).hasClass("checkAll");
+        if (f) {
+            if (e) {
+                $("input[type='checkbox']").each(function () {
+                    this.checked = true
+                });
+                b();
+                a()
+            } else {
+                $(this).checked = true;
+                var c = $("input[type='checkbox']:checked").length;
+                var d = $("input").length - 1;
+                if (c == d) {
+                    $("input[type='checkbox']").each(function () {
+                        this.checked = true
+                    })
+                }
+                b();
+                a()
+            }
+        } else {
+            if (e) {
+                $("input[type='checkbox']").each(function () {
+                    this.checked = false
+                });
+                b();
+                a()
+            } else {
+                $(this).checked = false;
+                var c = $(".th input[type='checkbox']:checked").length;
+                var d = $("input").length - 1;
+                if (c < d) {
+                    $(".checkAll").attr("checked", false)
+                }
+                b();
+                a()
+            }
+        }
+    });
+    $(".btns .cart").click(function () {
+        if ($(".categ p").hasClass("on")) {
+            var c = parseInt($(".num span").text());
+            var d = parseInt($(".goCart span").text());
+            $(".goCart span").text(c + d)
+        }
+    });
+    $(".del").click(function () {
+        let cartId = $(this).attr('cartId')
+        // alert(cartId)
+        if ($(this).parent().parent().hasClass("th")) {
+            $(".mask").show();
+            $(".tipDel").show();
+            index = $(this).parents(".th").index() - 1;
+            $(".cer").click(function () {
+                // 这里是单个删除商品的逻辑
+                $.ajax({
+                    url: contextPath+"mzmall/user/deleteCart/" + cartId,
+                    type: "post",
+                    resultType: "json",
+                    success: function (response) {
+                        console.log(response)
+                        if (response.code === 0){
+
+                        }else {
+                            layui.layer.msg(response.msg, {icon:2,time:1500});
+                        }
+                    }
+                });
+                $(".mask").hide();
+                $(".tipDel").hide();
+                $(".th").eq(index).remove();
+                $(".cer").off("click");
+                if ($(".th").length == 0) {
+                    $(".table .goOn").show()
+                }
+            })
+        } else {
+            if ($(".th input[type='checkbox']:checked").length == 0) {
+                $(".mask").show();
+                $(".pleaseC").show()
+            } else {
+                // alert('222')
+                // 这里是选择删除选中购物车内物品的逻辑
+                let checkId = []
+                $("input[type='checkbox']:checked").each(function(i){
+                    checkId[i] = $(this).val()
+                })
+                let cartIdsStr = checkId.join(",")
+                $.ajax({
+                    url: contextPath+"mzmall/user/deleteCart/" + cartIdsStr,
+                    type: "post",
+                    resultType: "json",
+                    success: function (response) {
+                        console.log(response)
+                        if (response.code === 0){
+
+                        }else {
+                            layui.layer.msg(response.msg, {icon:2,time:1500});
+                        }
+                    }
+                });
+                $(".mask").show();
+                $(".tipDel").show();
+                $(".cer").click(function () {
+                    $(".th input[type='checkbox']:checked").each(function (c) {
+                        index = $(this).parents(".th").index() - 1;
+                        $(".th").eq(index).remove();
+                        if ($(".th").length == 0) {
+                            $(".table .goOn").show()
+                        }
+                    });
+                    $(".mask").hide();
+                    $(".tipDel").hide();
+                    b();
+                    a()
+                })
+            }
+        }
+    });
+    $(".cancel").click(function () {
+        $(".mask").hide();
+        $(".tipDel").hide()
+    })
+</script>
+
+</body>
+</html>

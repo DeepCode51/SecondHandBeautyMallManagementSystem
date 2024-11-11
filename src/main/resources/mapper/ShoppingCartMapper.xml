@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xjr.mzmall.mapper.ShoppingCartMapper">
+    <select id="getCartInfo" resultType="com.xjr.mzmall.vo.CartVo">
+        SELECT cart_id,t1.goods_id,`count`,price,store_id,cover,good_desc,stock,goods_name,`count`*price as subtotal FROM (
+        SELECT cart_id,goods_id,`count` FROM shopping_cart WHERE user_id = #{userId}
+        ) as t1
+        LEFT JOIN
+        (
+        SELECT goods_id,price,store_id,cover,good_desc,stock,goods_name FROM goods WHERE `status` = 0
+        ) as t2
+        ON t1.goods_id = t2.goods_id
+    </select>
+
+    <select id="getCartInfoDo" resultType="com.xjr.mzmall.DO.CartInfoDo">
+        SELECT user_id, t1.goods_id,`count`,t1.store_id,goods.price,stock,price*`count` as subtotal, goods_name FROM
+        (
+        SELECT * FROM shopping_cart WHERE cart_id IN
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        ) as t1
+        LEFT JOIN
+        goods
+        ON t1.goods_id = goods.goods_id
+    </select>
+</mapper>

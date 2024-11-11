@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/public.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/login.css}"/>
+</head>
+<body><!-------------------login-------------------------->
+<div class="login">
+    <form action="#" method="post"><h1><a href="index.html">东方学院二手美妆商场</a></h1>
+        <p></p>
+        <!-- <div class="msg-warn hide"><b></b>公共场所不建议自动登录，以防账号丢失</div> -->
+        <p><input type="text" id="username" name="username" value="" placeholder="昵称"></p>
+        <p><input type="password" id="password" name="password" value="" placeholder="密码"></p>
+        <p><input type="submit" id="loginbtn" name="" value="登  录"></p>
+        <p class="txt">
+            <a class="" th:href="@{/mzmall/reg.html}">免费注册</a>
+<!--            <a href="forget.html">忘记密码？</a>-->
+        </p>
+    </form>
+</div>
+
+<script th:src="@{/staticRes/front/js/jquery-1.12.4.min.js}"></script>
+<script th:src="@{/staticRes/layui/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:inline="javascript">
+    let contextPath = [[@{/}]];
+
+
+    $("#loginbtn").on("click",function () {
+        $("#loginbtn").attr("disabled", "disabled");
+        let username = $("#username").val();
+        let password = $("#password").val();
+        if (username === ""){
+            layui.layer.msg("用户名不能为空",{icon:2,time:1500});
+            $("#loginbtn").removeAttr("disabled");
+            return false;
+        }
+        if (password == ""){
+            layui.layer.msg("密码不能为空",{icon:2,time:1500});
+            $("#loginbtn").removeAttr("disabled");
+            return false;
+        }
+        $.ajax({
+            url: contextPath+"mzmall/user/login",
+            type: "post",
+            data: {
+                username: $("#username").val(),
+                password: $("#password").val()
+            },
+            resultType: "json",
+            success: function (response) {
+                console.log(response)
+                if (response.code === 0){
+                    layui.layer.msg("登录成功，稍后跳转到首页",{icon:1,time:1500},function () {
+                        window.location.href="http://localhost:8080/mzmall/index";
+                    });
+                }else {
+                    layui.layer.msg(response.msg, {icon:2,time:1500});
+                    $("#loginbtn").removeAttr("disabled");
+                }
+            }
+        });
+        return false;
+    });
+</script>
+</body>
+</html>

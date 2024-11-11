@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xjr.mzmall.mapper.OrderMapper">
+    <select id="getPayOrderDo" resultType="com.xjr.mzmall.DO.PayOrderDo">
+        SELECT t1.order_id, t1.total_amount, t1.goods_count,
+        goods.goods_name, goods.price, goods.cover FROM
+        (
+        SELECT t1.*,goods_id,goods_count FROM
+        (
+        SELECT order_id,total_amount FROM `mz_order` WHERE order_id = #{orderId}
+        ) as t1
+        LEFT JOIN
+        order_detail ON t1.order_id = order_detail.order_id
+        ) as t1
+        LEFT JOIN goods ON t1.goods_id = goods.goods_id
+    </select>
+
+    <update id="changeOrderStatus">
+        update mz_order set order_status = #{orderStatus}
+        where order_id = #{orderId}
+    </update>
+
+    <select id="getPayOrderDo2" resultType="com.xjr.mzmall.DO.PayOrderDo">
+        SELECT t1.order_id, t1.total_amount, t1.goods_count,
+        goods.goods_name, goods.price, goods.cover FROM
+        (
+        SELECT t1.*,goods_id,goods_count FROM
+        (
+        SELECT order_id,total_amount FROM `mz_order` WHERE order_id in
+        <foreach collection="list" item="item" close=")" open="(" separator=",">
+            #{item}
+        </foreach>
+        ) as t1
+        LEFT JOIN
+        order_detail ON t1.order_id = order_detail.order_id
+        ) as t1
+        LEFT JOIN goods ON t1.goods_id = goods.goods_id
+    </select>
+
+    <select id="getMyOrderDo" resultType="com.xjr.mzmall.DO.MyOrderDo">
+        SELECT t1.order_id,t1.total_amount,t1.order_status,
+        t1.create_time,t1.goods_id,t1.goods_count,goods.goods_name,
+        goods.cover,goods.price,
+        CASE t1.order_status
+        WHEN 0 THEN '新下单'
+        WHEN 1 THEN '待支付'
+        WHEN 2 THEN '待发货'
+        WHEN 3 THEN '已发货'
+        WHEN 4 THEN '已签收'
+        WHEN 5 THEN '待评价'
+        WHEN 6 THEN '已取消'
+        WHEN 7 THEN '已退单'
+        WHEN 8 THEN '申请取消订单'
+        WHEN 9 THEN '申请退单'
+        WHEN 10 THEN '已完成'
+        WHEN 11 THEN '拒绝退单'
+        WHEN 12 THEN '申诉订单'
+        WHEN 13 THEN '申诉中'
+        END AS order_status_str
+        FROM
+        (
+        SELECT t1.order_id,t1.total_amount,order_status,t1.create_time,order_detail.goods_id,order_detail.goods_count FROM
+        (
+        SELECT * FROM mz_order WHERE user_id = #{userId}
+        <if test="orderStatus != null">
+            AND order_status = #{orderStatus}
+        </if>
+        <if test="orderStatus != null and orderStatus == 3">
+            OR order_status = 2
+        </if>
+        ) AS t1
+        LEFT JOIN order_detail ON t1.order_id = order_detail.order_id
+        ) AS t1
+        LEFT JOIN goods ON t1.goods_id = goods.goods_id
+        order by t1.create_time desc
+    </select>
+
+    <select id="getOrderDetailDo" resultType="com.xjr.mzmall.DO.OrderDetailDo">
+        SELECT t1.order_id, t1.total_amount, t1.order_status,t1.goods_id,
+        t1.goods_count,t1.delivery_name, t1.delivery_phone, t1.delivery_address,
+        goods.goods_name,goods.cover,goods.price,
+        CASE t1.order_status
+        WHEN 0 THEN '新下单'
+        WHEN 1 THEN '待支付'
+        WHEN 2 THEN '待发货'
+        WHEN 3 THEN '已发货'
+        WHEN 4 THEN '已签收'
+        WHEN 5 THEN '待评价'
+        WHEN 6 THEN '已取消'
+        WHEN 7 THEN '已退单'
+        WHEN 8 THEN '申请取消订单'
+        WHEN 9 THEN '申请退单'
+        WHEN 10 THEN '已完成'
+        WHEN 11 THEN '拒绝退单'
+        WHEN 12 THEN '申诉订单'
+        WHEN 13 THEN '申诉中'
+        END AS order_status_str
+        FROM
+        (
+        SELECT t1.order_id, t1.total_amount, t1.order_status,
+        t1.delivery_name, t1.delivery_phone, t1.delivery_address,
+        order_detail.goods_id,order_detail.goods_count FROM
+        (
+        SELECT order_id, total_amount, order_status,delivery_name,
+        delivery_phone,delivery_address FROM mz_order WHERE order_id = #{orderId}
+        ) AS t1
+        LEFT JOIN order_detail
+        ON t1.order_id = order_detail.order_id
+        ) AS t1
+        LEFT JOIN goods
+        ON t1.goods_id = goods.goods_id
+    </select>
+
+    <select id="getCommentsGoodsVo" resultType="com.xjr.mzmall.vo.CommentsGoodsVo">
+        SELECT count(comments.id) as comments_count,t1.goods_id,t1.goods_name,t1.cover,t1.price,t1.order_id FROM
+        (
+        SELECT goods.goods_id,goods.goods_name,goods.cover,goods.price,t1.order_id FROM
+        (
+        SELECT goods_id,t1.order_id FROM
+        (
+        SELECT order_id FROM mz_order WHERE user_id = #{userId} AND order_status = 4
+        ) AS t1
+        LEFT JOIN
+        order_detail ON t1.order_id = order_detail.order_id
+        ) AS t1
+        LEFT JOIN goods
+        ON t1.goods_id = goods.goods_id
+        ) AS t1
+        LEFT JOIN
+        comments
+        ON t1.goods_id = comments.goods_id
+        GROUP BY t1.goods_id,t1.order_id
+    </select>
+
+    <select id="getSellerOrderVo" resultType="com.xjr.mzmall.vo.SellerOrderVo">
+        SELECT t2.order_id,t2.total_amount,t2.order_status,t2.pay_status,t2.create_time,
+        CASE t2.order_status
+        WHEN 0 THEN '新下单'
+        WHEN 1 THEN '待支付'
+        WHEN 2 THEN '待发货'
+        WHEN 3 THEN '已发货'
+        WHEN 4 THEN '已签收'
+        WHEN 5 THEN '待评价'
+        WHEN 6 THEN '已取消'
+        WHEN 7 THEN '已退单'
+        WHEN 8 THEN '申请取消订单'
+        WHEN 9 THEN '申请退单'
+        WHEN 10 THEN '已完成'
+        WHEN 11 THEN '拒绝退单'
+        WHEN 12 THEN '申诉订单'
+        WHEN 13 THEN '申诉中'
+        END AS order_status_str,
+        CASE t2.pay_status
+        WHEN 0 THEN '待支付'
+        WHEN 1 THEN '已支付'
+        END AS pay_status_str
+        FROM
+        (
+        SELECT * FROM store WHERE user_id = #{userId}
+        ) AS t1
+        LEFT JOIN
+        (
+        SELECT * FROM
+        mz_order
+        <where>
+            <if test="orderId != null">
+                order_id = #{orderId}
+            </if>
+        </where>
+        ) AS t2
+        ON t1.id = t2.store_id
+
+    </select>
+
+    <select id="getSellerOrderListWait" resultType="com.xjr.mzmall.vo.SellerOrderVo">
+        SELECT t2.order_id,t2.total_amount,t2.order_status,t2.pay_status,t2.create_time,
+        CASE t2.order_status
+        WHEN 0 THEN '新下单'
+        WHEN 1 THEN '待支付'
+        WHEN 2 THEN '待发货'
+        WHEN 3 THEN '已发货'
+        WHEN 4 THEN '已签收'
+        WHEN 5 THEN '待评价'
+        WHEN 6 THEN '已取消'
+        WHEN 7 THEN '已退单'
+        WHEN 8 THEN '申请取消订单'
+        WHEN 9 THEN '申请退单'
+        WHEN 10 THEN '已完成'
+        WHEN 11 THEN '拒绝退单'
+        WHEN 12 THEN '申诉订单'
+        WHEN 13 THEN '申诉中'
+        END AS order_status_str,
+        CASE t2.pay_status
+        WHEN 0 THEN '待支付'
+        WHEN 1 THEN '已支付'
+        END AS pay_status_str
+        FROM
+        (
+        SELECT * FROM store WHERE user_id = #{userId}
+        ) AS t1
+        INNER JOIN
+        (
+        SELECT * FROM
+        mz_order
+        where
+        order_status = 2
+        <if test="orderId != null">
+           and order_id = #{orderId}
+        </if>
+        ) AS t2
+        ON t1.id = t2.store_id
+    </select>
+
+    <select id="getSellerOrderListCancel" resultType="com.xjr.mzmall.vo.SellerOrderVo">
+        SELECT t2.order_id,t2.total_amount,t2.order_status,t2.pay_status,t2.create_time,
+        CASE t2.order_status
+        WHEN 0 THEN '新下单'
+        WHEN 1 THEN '待支付'
+        WHEN 2 THEN '待发货'
+        WHEN 3 THEN '已发货'
+        WHEN 4 THEN '已签收'
+        WHEN 5 THEN '待评价'
+        WHEN 6 THEN '已取消'
+        WHEN 7 THEN '已退单'
+        WHEN 8 THEN '申请取消订单'
+        WHEN 9 THEN '申请退单'
+        WHEN 10 THEN '已完成'
+        WHEN 11 THEN '拒绝退单'
+        WHEN 12 THEN '申诉订单'
+        WHEN 13 THEN '申诉中'
+        END AS order_status_str,
+        CASE t2.pay_status
+        WHEN 0 THEN '待支付'
+        WHEN 1 THEN '已支付'
+        END AS pay_status_str
+        FROM
+        (
+        SELECT * FROM store WHERE user_id = #{userId}
+        ) AS t1
+        INNER JOIN
+        (
+        SELECT * FROM
+        mz_order
+        where
+        order_status = 6
+        <if test="orderId != null">
+            and order_id = #{orderId}
+        </if>
+        ) AS t2
+        ON t1.id = t2.store_id
+    </select>
+
+    <select id="getSellerOrderListReturn" resultType="com.xjr.mzmall.vo.SellerOrderVo">
+        SELECT t2.order_id,t2.total_amount,t2.order_status,t2.pay_status,t2.create_time,
+        CASE t2.order_status
+        WHEN 0 THEN '新下单'
+        WHEN 1 THEN '待支付'
+        WHEN 2 THEN '待发货'
+        WHEN 3 THEN '已发货'
+        WHEN 4 THEN '已签收'
+        WHEN 5 THEN '待评价'
+        WHEN 6 THEN '已取消'
+        WHEN 7 THEN '已退单'
+        WHEN 8 THEN '申请取消订单'
+        WHEN 9 THEN '申请退单'
+        WHEN 10 THEN '已完成'
+        WHEN 11 THEN '拒绝退单'
+        WHEN 12 THEN '申诉订单'
+        WHEN 13 THEN '申诉中'
+        END AS order_status_str,
+        CASE t2.pay_status
+        WHEN 0 THEN '待支付'
+        WHEN 1 THEN '已支付'
+        END AS pay_status_str
+        FROM
+        (
+        SELECT * FROM store WHERE user_id = #{userId}
+        ) AS t1
+        INNER JOIN
+        (
+        SELECT * FROM
+        mz_order
+        where
+        order_status = 9
+        <if test="orderId != null">
+            and order_id = #{orderId}
+        </if>
+        ) AS t2
+        ON t1.id = t2.store_id
+    </select>
+
+    <select id="getSellerOrderListFinish" resultType="com.xjr.mzmall.vo.SellerOrderVo">
+        SELECT t2.order_id,t2.total_amount,t2.order_status,t2.pay_status,t2.create_time,
+        CASE t2.order_status
+        WHEN 0 THEN '新下单'
+        WHEN 1 THEN '待支付'
+        WHEN 2 THEN '待发货'
+        WHEN 3 THEN '已发货'
+        WHEN 4 THEN '已签收'
+        WHEN 5 THEN '待评价'
+        WHEN 6 THEN '已取消'
+        WHEN 7 THEN '已退单'
+        WHEN 8 THEN '申请取消订单'
+        WHEN 9 THEN '申请退单'
+        WHEN 10 THEN '已完成'
+        WHEN 11 THEN '拒绝退单'
+        WHEN 12 THEN '申诉订单'
+        WHEN 13 THEN '申诉中'
+        END AS order_status_str,
+        CASE t2.pay_status
+        WHEN 0 THEN '待支付'
+        WHEN 1 THEN '已支付'
+        END AS pay_status_str
+        FROM
+        (
+        SELECT * FROM store WHERE user_id = #{userId}
+        ) AS t1
+        INNER JOIN
+        (
+        SELECT * FROM
+        mz_order
+        where
+        order_status = 10
+        <if test="orderId != null">
+            and order_id = #{orderId}
+        </if>
+        ) AS t2
+        ON t1.id = t2.store_id
+    </select>
+
+    <select id="getAllOrderList" resultType="com.xjr.mzmall.vo.AdminOrderVo">
+        SELECT order_id,total_amount,order_status,pay_status,create_time,
+        CASE order_status
+        WHEN 0 THEN '新下单'
+        WHEN 1 THEN '待支付'
+        WHEN 2 THEN '待发货'
+        WHEN 3 THEN '已发货'
+        WHEN 4 THEN '已签收'
+        WHEN 5 THEN '待评价'
+        WHEN 6 THEN '已取消'
+        WHEN 7 THEN '已退单'
+        WHEN 8 THEN '申请取消订单'
+        WHEN 9 THEN '申请退单'
+        WHEN 10 THEN '已完成'
+        WHEN 11 THEN '拒绝退单'
+        WHEN 12 THEN '申诉订单'
+        WHEN 13 THEN '申诉中'
+        END AS order_status_str,
+        CASE pay_status
+        WHEN 0 THEN '待支付'
+        WHEN 1 THEN '已支付'
+        END AS pay_status_str
+        FROM
+        mz_order
+        <where>
+            <if test="orderId != null">
+                and order_id = #{orderId}
+            </if>
+        </where>
+    </select>
+
+    <select id="getFinishOrderAmount" resultType="java.math.BigDecimal">
+        SELECT sum(total_amount) FROM mz_order WHERE store_id = #{storeId} AND (order_status = 10 OR order_status = 5)
+         GROUP BY store_id
+    </select>
+</mapper>

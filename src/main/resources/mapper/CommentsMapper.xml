@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xjr.mzmall.mapper.CommentsMapper">
+   <select id="getCommentsByGoodsId" resultType="com.xjr.mzmall.entity.Comments">
+       SELECT t1.id,t1.goods_id,t1.parent_id,t1.content,t1.user_id,
+       t1.user_cover,t1.create_time,`user`.username FROM
+       (
+       SELECT id,goods_id,parent_id,content,user_id,user_cover,create_time
+       FROM comments WHERE goods_id = #{goodsId}
+       ) AS t1
+       LEFT JOIN
+       `user`
+       ON t1.user_id = `user`.user_id
+   </select>
+
+   <select id="getComment" resultType="com.xjr.mzmall.vo.CommentVo">
+        SELECT t1.id as comments_id,t1.content, `user`.username, t1.create_time FROM
+        (
+        SELECT comments.* FROM
+        (
+        SELECT goods_id FROM goods WHERE store_id =
+        (
+        SELECT id FROM store WHERE user_id = #{userId}
+        )
+        )AS t1
+        INNER JOIN
+        comments ON comments.goods_id = t1.goods_id
+        ) AS t1
+        LEFT JOIN
+        `user`
+        ON t1.user_id = `user`.user_id
+
+   </select>
+    <select id="getCommentOne" resultType="com.xjr.mzmall.vo.CommentVo">
+        SELECT t1.id as comments_id,t1.content, `user`.username, t1.create_time, t1.goods_name FROM
+        (
+        SELECT t1.*,goods.goods_name FROM
+        (
+        SELECT * FROM comments WHERE id = #{id}
+        ) AS t1
+        LEFT JOIN
+        goods
+        ON goods.goods_id = t1.goods_id
+        ) AS t1
+        LEFT JOIN
+        `user`
+        ON `user`.user_id = t1.user_id
+    </select>
+</mapper>

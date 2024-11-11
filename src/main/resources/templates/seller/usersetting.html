@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>基本资料</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/staticRes/layui/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/staticRes/layui/css/public.css}" media="all">
+    <style>
+        .layui-form-item .layui-input-company {width: auto;padding-right: 10px;line-height: 38px;}
+    </style>
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <div class="layui-form layuimini-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label required">卖家账号</label>
+                <div class="layui-input-block">
+                    <input type="text" name="username" disabled lay-verify="required" lay-reqtext="不能为空" placeholder="请输入"  th:value="${session.user.username}" class="layui-input">
+                    <tip>填写自己管理账号的名称。</tip>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label required">姓名</label>
+                <div class="layui-input-block">
+                    <input type="text" name="name" lay-verify="required" lay-reqtext="姓名不能为空" placeholder="请输入管理姓名"  th:value="${session.user.name}" class="layui-input">
+                    <tip>填写自己管理账号的名称。</tip>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label required">手机</label>
+                <div class="layui-input-block">
+                    <input type="number" name="phone" lay-verify="required" lay-reqtext="手机不能为空" placeholder="请输入手机"  th:value="${session.user.phone}" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label required">邮箱</label>
+                <div class="layui-input-block">
+                    <input type="email" name="email" lay-verify="required" lay-reqtext="邮箱不能为空" placeholder="请输入邮箱"  th:value="${session.user.email}" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label required">店铺名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="storeName" lay-verify="required" lay-reqtext="店铺名称不能为空" placeholder="请输入店铺名称"  th:value="${store.storeName}" class="layui-input">
+                </div>
+            </div>
+
+
+            <input type="text" hidden th:value="${store.id}" name="storeId">
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script th:src="@{/staticRes/layui/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:src="@{/staticRes/layui/js/lay-config.js?v=1.0.4}" charset="utf-8"></script>
+<script th:inline="javascript">
+    let contextPath = [[@{/}]];
+    layui.use(['form','miniTab'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            miniTab = layui.miniTab,
+            $ = layui.$;
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            let phone = data.field.phone;
+            let ph = /^1[3|4|5|7|8]\d{9}$/;
+            if (ph.test(phone) === false){
+                layui.layer.msg("手机号不正确",{icon:2,time:1500});
+                return false;
+            }
+            let url = contextPath + 'seller/updatev2';
+            $.post(url,data.field,function (response) {
+                $("#savebtn").attr('disabled','disabled').addClass("layui-btn-disabled")
+                if (response.code == 0){
+                    layer.msg(response.msg,{icon:1,time: 1000},function (index) {
+                        layer.close(index);
+                        miniTab.deleteCurrentByIframe();
+                    })
+                }else{
+                    layer.msg(response.msg,{icon:2,anim:6})
+                    $("#savebtn").removeClass("layui-btn-disabled").removeAttr('disabled','disabled')
+                }
+            })
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

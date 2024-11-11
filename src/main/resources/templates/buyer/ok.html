@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="utf-8"/>
+    <title>ok</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/public.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/proList.css}"/>
+</head>
+<body><!----------------------------------------order------------------>
+<div class="head ding" th:include="buyer/common :: header"></div>
+<div class="order mt cart">
+    <div class="site">
+        <p class="wrapper clearfix">
+            <span class="fl">支付成功</span>
+        </p>
+    </div>
+    <p class="ok">支付成功！剩余<span>5</span>秒
+        <a th:href="@{/mzmall/myorder}">返回订单页</a>
+    </p>
+</div>
+<div class="like">
+    <h4>猜你喜欢</h4>
+    <div class="bottom">
+        <div class="hd">
+            <span class="prev">
+                <img th:src="@{/staticRes/front/img/temp/prev.png}">
+            </span>
+            <span class="next">
+                <img th:src="@{/staticRes/front/img/temp/next.png}">
+            </span>
+        </div>
+        <div class="imgCon bd">
+            <div class="likeList clearfix">
+                <div style="display: flex; justify-content: center;" th:each="goodsList : ${guessYouWillLikeGoods}">
+                    <a th:each="item : ${goodsList}" th:href="@{'/mzmall/detail?goodsid=' + ${item.goodsId}}">
+                        <dl>
+                            <dt><img th:src="@{'/mzmall/img/cover/' + ${item.cover}}"></dt>
+                            <dd th:text="${item.goodsName}"></dd>
+                            <dd th:text="'￥' + ${item.price}"></dd>
+                        </dl>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--footer-->
+<div class="footer" th:replace="buyer/common :: footer"></div>
+
+
+<script th:src="@{/staticRes/front/js/jquery-1.12.4.min.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/public.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/pro.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/jquery.SuperSlide.2.1.1.js}" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+    jQuery(".bottom").slide({
+        titCell: ".hd ul",
+        mainCell: ".bd .likeList",
+        autoPage: true,
+        autoPlay: false,
+        effect: "leftLoop",
+        autoPlay: true,
+        vis: 1
+    });
+</script>
+</body>
+</html>

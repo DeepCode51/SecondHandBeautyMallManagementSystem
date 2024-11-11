@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xjr.mzmall.mapper.StoreMapper">
+    <select id="getStoreVo" resultType="com.xjr.mzmall.vo.StoreVo">
+        SELECT t1.id,t1.store_name,`user`.username,`user`.`name` FROM
+        (
+        SELECT * FROM store WHERE id = #{storeId}
+        ) AS t1
+        LEFT JOIN
+        `user`
+        ON
+        `user`.user_id =t1.user_id
+    </select>
+
+    <select id="getTopFive" resultType="com.xjr.mzmall.DO.StoreTopDo">
+        SELECT count(order_id) AS order_count, store_id FROM mz_order
+        WHERE create_time &gt;= #{beginDay} AND create_time &lt; #{endDay}
+        GROUP BY store_id ORDER BY order_count DESC limit 5
+    </select>
+
+    <select id="getCountByStore" resultType="integer">
+        SELECT count(order_id) FROM
+        mz_order WHERE store_id = #{storeId}
+        AND date_format(create_time,'%Y-%m-%d') = #{time}
+    </select>
+
+    <select id="getTotalAmount" resultType="java.math.BigDecimal">
+        SELECT sum(total_amount) FROM mz_order WHERE
+        store_id = #{storeId} AND order_status = 10 GROUP BY store_id
+    </select>
+</mapper>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="utf-8"/>
+    <title>东方学院二手美妆商场</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/public.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/myorder.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/layui/lib/layui-v2.6.3/css/layui.css}"/>
+</head>
+<body>
+<!------------------------------head------------------------------>
+<div class="head ding" th:replace="buyer/common :: headerforuserinfo"></div>
+<!------------------------------idea------------------------------>
+<div class="address">
+    <div class="wrapper clearfix"><a th:href="@{/mzmall/index.html}" class="fl">首页</a><span>/</span>
+        <a th:href="@{/mzmall/myorder}" class="on">我的订单</a>
+    </div>
+</div>
+<!------------------------------Bott------------------------------>
+<div class="Bott">
+    <div class="wrapper clearfix">
+        <div class="zuo fl" th:replace="buyer/common :: infoLeftMenu"></div>
+        <div class="you fl">
+            <div class="my clearfix">
+                <h2 class="fl">我的订单</h2>
+                <!-- <a href="#" class="fl">请谨防钓鱼链接或诈骗电话，了解更多&gt;</a> -->
+            </div>
+            <div class="dlist clearfix">
+                <ul class="fl clearfix" id="wa">
+                    <li><a th:href="@{/mzmall/myorder}">全部有效订单</a></li>
+                    <li><a th:href="@{'/mzmall/myorder?orderstatus=1'}">待支付</a></li>
+                    <li><a th:href="@{'/mzmall/myorder?orderstatus=3'}">待收货</a></li>
+                    <li><a th:href="@{'/mzmall/myorder?orderstatus=4'}">已收货</a></li>
+                    <li><a th:href="@{'/mzmall/myorder?orderstatus=6'}">已取消</a></li>
+                </ul>
+                <!-- <form action="#" method="get" class="fr clearfix">
+                    <input type="text" name="" id="" value="" placeholder="请输入商品名称、订单号"/>
+                    <input type="button" name="" id="" value=""/>
+                </form> -->
+            </div>
+            <div class="dkuang" th:each="order : ${myOrderVo}">
+                <p class="one" th:text="${order.orderStatusStr}">已收货</p>
+                <div class="word clearfix">
+                    <ul class="fl clearfix">
+                        <li th:text="${order.createTime}">2016年12月1日 18:53</li>
+                        <li th:text="${session.user.name}">杨小黄</li>
+                        <li th:text="'订单号:'+ ${order.orderId}">订单号:5160513358520018</li>
+                        <li>在线支付</li>
+                    </ul>
+                    <p class="fr">订单金额：<span th:text="${order.totalAmount}">99.00</span>元</p>
+                </div>
+                <div style=" display: flex; justify-content: space-between;">
+                    <div>
+                        <div class="shohou clearfix" th:each="goods : ${order.list}">
+                            <a href="#" class="fl">
+                                <img style="width: 69px; height: 69px;" th:src="@{'/mzmall/img/cover/' + ${goods.goodsCover}}"/></a>
+                            <p class="fl"><a th:href="@{'/mzmall/detail?goodsid='+${goods.goodsId}}" th:text="${goods.goodsName}">家用创意菜盘子圆盘 釉下彩复古</a>
+                                <a href="#" th:text="'¥'+${goods.price} + 'x' + ${goods.goodsCount}">¥99.00×1</a></p>
+                        </div>
+                    </div>
+                    <div style="width: 150px; display: flex; align-items: center;">
+                        <p class="fr" >
+                            <a style="display: block; width: 118px; height: 28px; line-height: 28px;
+                            text-align: center;
+                            border: 1px solid #B0B0B0; margin-bottom: 10px;" th:if="${order.orderStatus == 1}" th:href="@{'/mzmall/topay/' + ${order.orderId}}">去支付</a>
+                            <a style="display: block; width: 118px; height: 28px; line-height: 28px;
+                            text-align: center;
+                            border: 1px solid #B0B0B0; margin-bottom: 10px;"
+                               th:if="${order.orderStatus == 3}" onclick="confirmOrder(this)"
+                               href="#" th:attr="orderID = ${order.orderId}">确认收货</a>
+                            <a style="display: block; width: 118px; height: 28px; line-height: 28px;
+                            text-align: center;
+                            border: 1px solid #B0B0B0; margin-bottom: 10px;"
+                               th:if="${order.orderStatus == 1 }" onclick="cancelOrder(this)"
+                               href="#" th:attr="orderID = ${order.orderId}">取消订单</a>
+                            <a style="display: block; width: 118px; height: 28px; line-height: 28px;
+                            text-align: center;
+                            border: 1px solid #B0B0B0; margin-bottom: 10px;"
+                               th:if="${order.orderStatus == 10 || order.orderStatus == 2 || order.orderStatus == 3 || order.orderStatus == 4 || order.orderStatus == 5}"
+                               onclick="returnOrder(this)"
+                               href="#" th:attr="orderID = ${order.orderId}">申请退单</a>
+                            <a style="display: block; width: 118px; height: 28px; line-height: 28px;
+                            text-align: center;
+                            border: 1px solid #B0B0B0; margin-bottom: 10px;"
+                               th:if="${order.orderStatus == 11 }" onclick="complaintOrder(this)"
+                               href="#" th:attr="orderID = ${order.orderId}">申诉订单</a>
+                            <a style="display: block; width: 118px; height: 28px; line-height: 28px;
+                            text-align: center;
+                            border: 1px solid #B0B0B0; margin-bottom: 10px;" th:if="${order.orderStatus == 4}" th:href="@{/mzmall/myprod.html}">去评价</a>
+                            <a style="display: block;
+                            width: 118px;
+                            height: 28px;
+                            line-height: 28px;
+                            text-align: center;
+                            border: 1px solid #B0B0B0;" th:href="@{'/mzmall/orderxq.html?orderId=' + ${order.orderId}}">订单详情</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="fenye clearfix">
+                <a href="#"><img src="img/zuo.jpg"/></a>
+                <a href="#">1</a>
+                <a href="#"><img src="img/you.jpg"/></a>
+            </div> -->
+        </div>
+    </div>
+</div>
+<!--返回顶部-->
+<div class="gotop" th:replace="buyer/common :: rightTool"></div>
+<!--footer-->
+<div class="footer" th:replace="buyer/common :: footer"></div>
+
+
+<div class="layui-form layuimini-form" id="returnForm" style="display: none">
+    <div class="layui-form-item" style="margin-top: 10px">
+        <label class="layui-form-label required">退款原因</label>
+        <div class="layui-input-block">
+            <input type="text" style="width: 300px" id="returnReason" name="returnReason" lay-verify="required" lay-reqtext="退款原因不能为空" placeholder="请输入退款原因" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button id="savebtn" onclick="subReturnApply()" class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认提交</button>
+        </div>
+    </div>
+</div>
+
+
+<div class="layui-form layuimini-form" id="complaintForm" style="display: none">
+    <div class="layui-form-item" style="margin-top: 10px">
+        <label class="layui-form-label required">申诉原因</label>
+        <div class="layui-input-block">
+            <input type="text" style="width: 300px" id="complaintReason" name="returnReason" lay-verify="required" lay-reqtext="申诉原因不能为空" placeholder="请输入申诉原因" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button id="subBtn" onclick="subComplaintApply()" class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认提交</button>
+        </div>
+    </div>
+</div>
+
+
+<script th:src="@{/staticRes/front/js/jquery-1.12.4.min.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/layui/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/public.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/user.js}" type="text/javascript" charset="utf-8"></script>
+
+<script th:inline="javascript">
+    let contextPath = [[@{/}]];
+
+
+    $('#logoutBtn').click(function () {
+        $("#logoutBtn").attr("disabled", "disabled");
+        $.ajax({
+            url: contextPath+"mzmall/user/logout",
+            type: "post",
+            resultType: "json",
+            success: function (response) {
+                if (response.code === 0){
+                    window.location.href="http://localhost:8080/mzmall/login";
+                }else {
+                    layui.layer.msg(response.msg,{icon:2,time:1500});
+                    $("#logoutBtn").attr("disabled",false);
+                }
+            }
+        });
+    });
+
+    $('#confirmOrderBtn').click(function  () {
+        let orderId = $('#confirmOrderBtn').attr('orderID')
+        $("#confirmOrderBtn").attr("disabled", "disabled");
+        $.ajax({
+            url: contextPath+"mzmall/user/confirmOrder/" + orderId,
+            type: "post",
+            resultType: "json",
+            success: function (response) {
+                if (response.code === 0){
+                    history.go(0)
+                }else {
+                    layui.layer.msg(response.msg,{icon:2,time:1500});
+                    $("#confirmOrderBtn").attr("disabled",false);
+                }
+            }
+        });
+    })
+
+    function confirmOrder(obj) {
+        let thisObj = $(obj)
+        let orderId = thisObj.attr('orderID')
+        thisObj.attr("disabled", "disabled");
+        $.ajax({
+            url: contextPath+"mzmall/user/confirmOrder/" + orderId,
+            type: "post",
+            resultType: "json",
+            success: function (response) {
+                if (response.code === 0){
+                    history.go(0)
+                }else {
+                    layui.layer.msg(response.msg,{icon:2,time:1500});
+                    thisObj.attr("disabled",false);
+                }
+            }
+        });
+    }
+
+    function cancelOrder(obj) {
+        let thisObj = $(obj)
+        let orderId = thisObj.attr('orderID')
+        thisObj.attr("disabled", "disabled");
+        layui.layer.confirm('确认取消该订单?', {icon: 3, title: '确认取消'}, function (index) {
+            $.ajax({
+                url: contextPath+"mzmall/user/cancelOrder/" + orderId,
+                type: "post",
+                resultType: "json",
+                success: function (response) {
+                    if (response.code === 0){
+                        history.go(0)
+                    }else {
+                        layui.layer.msg(response.msg,{icon:2,time:1500});
+                        thisObj.attr("disabled",false);
+                    }
+                }
+            });
+            layer.close(index);
+        })
+    }
+
+    let returnOrderId = ''
+    let index = ''
+    let returnObj = ''
+
+    function returnOrder(obj) {
+        let thisObj = $(obj)
+        returnObj = thisObj
+        let orderId = thisObj.attr('orderID')
+        thisObj.attr("disabled", "disabled");
+        returnOrderId = orderId
+        index = layui.layer.open({
+            type:1,
+            area:['500px', '200px'],
+            title: '退单申请',
+            content: $('#returnForm'),
+            shade:0,
+        })
+        // layui.layer.confirm('确认退单?', {icon: 3, title: '确认退单'}, function (index) {
+        //     $.ajax({
+        //         url: contextPath+"mzmall/user/returnOrder/" + orderId,
+        //         type: "post",
+        //         resultType: "json",
+        //         success: function (response) {
+        //             if (response.code === 0){
+        //                 history.go(0)
+        //             }else {
+        //                 layui.layer.msg(response.msg,{icon:2,time:1500});
+        //                 thisObj.attr("disabled",false);
+        //             }
+        //         }
+        //     });
+        //     layer.close(index);
+        // })
+    }
+
+    function subReturnApply() {
+        let reason = $('#returnReason').val()
+        console.log(reason)
+        console.log(returnOrderId)
+        $.ajax({
+            url: contextPath+"mzmall/user/returnOrder",
+            type: "post",
+            resultType: "json",
+            data: {orderId:returnOrderId,returnReason: reason},
+            success: function (response) {
+                if (response.code === 0){
+                    layui.layer.msg('操作成功',{icon:1,time:1500});
+                    layui.layer.close(index)
+                    history.go(0)
+                }else {
+                    layui.layer.msg(response.msg,{icon:2,time:1500});
+                    returnObj.attr("disabled",false);
+                }
+                layer.close(index);
+            }
+        });
+    }
+
+    function complaintOrder(obj) {
+        let thisObj = $(obj)
+        returnObj = thisObj
+        let orderId = thisObj.attr('orderID')
+        thisObj.attr("disabled", "disabled");
+        returnOrderId = orderId
+        index = layui.layer.open({
+            type:1,
+            area:['500px', '200px'],
+            title: '订单申诉',
+            content: $('#complaintForm'),
+            shade:0,
+        })
+    }
+
+    function subComplaintApply() {
+        let reason = $('#complaintReason').val()
+        console.log(reason)
+        console.log(returnOrderId)
+        $.ajax({
+            url: contextPath+"mzmall/user/complaintOrder",
+            type: "post",
+            resultType: "json",
+            data: {orderId:returnOrderId,reason: reason},
+            success: function (response) {
+                if (response.code === 0){
+                    layui.layer.msg('操作成功',{icon:1,time:1500});
+                    layui.layer.close(index)
+                    history.go(0)
+                }else {
+                    layui.layer.msg(response.msg,{icon:2,time:1500});
+                    returnObj.attr("disabled",false);
+                }
+                layer.close(index);
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

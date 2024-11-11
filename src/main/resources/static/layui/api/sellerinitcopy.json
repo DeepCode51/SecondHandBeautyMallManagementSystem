@@ -1,0 +1,101 @@
+{
+  "homeInfo": {
+    "title": "首页",
+    "href": "welcome.html?t=1"
+  },
+  "logoInfo": {
+    "title": "东方学院二手美妆商场",
+    "image": "/staticRes/layui/images/logo.png",
+    "href": ""
+  },
+  "menuInfo": [
+    {
+      "title": "常规管理",
+      "icon": "fa fa-address-book",
+      "href": "",
+      "target": "_self",
+      "child": [
+        {
+          "title": "商品管理",
+          "href": "",
+          "icon": "fa fa-home",
+          "target": "_self",
+          "child": [
+            {
+              "title": "商品列表",
+              "href": "goodslist.html",
+              "icon": "fa fa-tachometer",
+              "target": "_self"
+            }
+          ]
+        },
+        {
+          "title": "订单管理",
+          "href": "",
+          "icon": "fa fa-calendar",
+          "target": "_self",
+          "child": [
+            {
+              "title": "所有订单",
+              "href": "allorderlist.html",
+              "icon": "fa fa-list-alt",
+              "target": "_self"
+            },
+            {
+              "title": "待发货",
+              "href": "waitorderlist.html",
+              "icon": "fa fa-list-alt",
+              "target": "_self"
+            },
+            {
+              "title": "订单取消申请",
+              "href": "cancelapplylist.html",
+              "icon": "fa fa-list-alt",
+              "target": "_self"
+            },
+            {
+              "title": "退款申请",
+              "href": "returnapplylist.html",
+              "icon": "fa fa-list-alt",
+              "target": "_self"
+            },
+            {
+              "title": "已完成订单",
+              "href": "finishorderlist.html",
+              "icon": "fa fa-list-alt",
+              "target": "_self"
+            }
+          ]
+        },
+        {
+          "title": "评论管理",
+          "href": "",
+          "icon": "fa fa-flag-o",
+          "target": "_self",
+          "child": [
+            {
+              "title": "评论列表",
+              "href": "commentslist.html",
+              "icon": "fa fa-stumbleupon-circle",
+              "target": "_self"
+            }
+          ]
+        },
+        {
+          "title": "问答管理",
+          "href": "",
+          "icon": "fa fa-home",
+          "target": "_self",
+          "child": [
+            {
+              "title": "问题列表",
+              "href": "qalist.html",
+              "icon": "fa fa-hourglass-end",
+              "target": "_self"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

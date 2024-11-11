@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="utf-8"/>
+    <title>东方学院二手美妆商场</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/public.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/myorder.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/layui/lib/layui-v2.6.3/css/layui.css}"/>
+</head>
+<body><!------------------------------head------------------------------>
+<div class="head ding" th:replace="buyer/common :: headerforuserinfo"></div>
+<!------------------------------idea------------------------------>
+<div class="address">
+    <div class="wrapper clearfix"><a th:href="@{/mzmall/index.html}" class="fl">首页</a><span>/</span>
+        <a th:href="@{/mzmall/myorder}" class="on">我的订单</a><span>/</span>
+        <a href="#" class="on">待评价商品</a></div>
+</div>
+<!------------------------------Bott------------------------------>
+<div class="Bott">
+    <div class="wrapper clearfix">
+        <div class="zuo fl" th:replace="buyer/common :: infoLeftMenu"></div>
+        <div class="you fl">
+            <div class="my clearfix">
+                <h2 class="fl">商品评价</h2>
+            </div>
+            <div class="dlist">
+                <ul class="clearfix" id="pro">
+                    <li class="on"><a href="#2">待评价商品</a></li>
+                    <!-- <li><a href="#2">已评价商品</a></li>
+                    <li><a href="#2">评价失效商品</a></li> -->
+                </ul>
+            </div>
+            <div class="sx clearfix">
+                <div class="clearfix">
+                    <dl class="fl" th:each="item : ${commentsGoodsVo}">
+                        <dt>
+                            <a th:href="@{'/mzmall/detail?goodsid=' + ${item.goodsId}}">
+                                <img style="width: 162px; height: 200px;" th:src="@{'/mzmall/img/cover/' + ${item.cover}}"/>
+                            </a>
+                        </dt>
+                        <dd><a href="#" th:text="${item.goodsName}"></a></dd>
+                        <dd th:text="'¥' + ${item.price}">¥199.00</dd>
+                        <dd th:text="${item.commentsCount} + '人评价'">16000人评价</dd>
+                        <dd><a href="#2" onclick="getData(this)" th:attr="goodsId = ${item.goodsId}, orderId=${item.orderId}">评价</a></dd>
+                    </dl>
+                    <h3 th:if="${commentsGoodsVo.size() == 0}" style="text-align: center;">暂无评价商品</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--<dl class="fl"><dt><a href="#"><img src="img/nav3.jpg"/></a></dt><dd><a href="#">家用创意壁挂  釉下彩复古</a></dd><dd>¥199.00</dd><dd>16000人评价</dd><dd><a href="#">待评价</a></dd></dl><dl class="fl"><dt><a href="#"><img src="img/nav3.jpg"/></a></dt><dd><a href="#">家用创意壁挂  釉下彩复古</a></dd><dd>¥199.00</dd><dd>16000人评价</dd><dd><a href="#">待评价</a></dd></dl>-->
+<!--遮罩-->
+<div class="mask"></div><!--评价弹框-->
+<div class="pj">
+    <div class="clearfix">
+        <a href="#" class="fr gb">
+            <img th:src="@{/staticRes/front/img/icon4.png}"/>
+        </a>
+    </div>
+    <h3>商品评分</h3>
+    <form>
+        <textarea name="commentsContent" id="commentsContent" value="" rows="" cols="" placeholder="请输入评价"></textarea>
+        <div class="bc">
+            <input type="button" id="saveBtn" value="保存"/>
+            <input type="button" value="取消"/>
+        </div>
+    </form>
+</div>
+<!--查看评价-->
+<!--返回顶部-->
+<div class="gotop" th:replace="buyer/common :: rightTool"></div>
+<!--footer-->
+<div class="footer" th:replace="buyer/common :: footer"></div>
+
+
+<script th:src="@{/staticRes/front/js/jquery-1.12.4.min.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/layui/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/public.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/user.js}" type="text/javascript" charset="utf-8"></script>
+
+<script th:inline="javascript">
+    let contextPath = [[@{/}]];
+
+
+    $('#logoutBtn').click(function () {
+        $("#logoutBtn").attr("disabled", "disabled");
+        $.ajax({
+            url: contextPath+"mzmall/user/logout",
+            type: "post",
+            resultType: "json",
+            success: function (response) {
+                if (response.code === 0){
+                    window.location.href="http://localhost:8080/mzmall/login";
+                }else {
+                    layui.layer.msg(response.msg,{icon:2,time:1500});
+                    $("#logoutBtn").attr("disabled",false);
+                }
+            }
+        });
+    });
+
+
+    let goodsId
+    let orderId
+    function getData(obj) {
+        let thisObj = $(obj)
+        goodsId = thisObj.attr('goodsId')
+        console.log(goodsId)
+        orderId = thisObj.attr('orderId')
+        console.log(orderId)
+    }
+
+    $('#saveBtn').click(function () {
+        let content = $('#commentsContent').val()
+        if (content == '') {
+            layui.layer.msg('评论内容不能为空',{icon:2,time:1500});
+            return
+        }
+        // 发送评论请求 需要商品编号
+        $.ajax({
+            url: contextPath+"mzmall/user/pubComments",
+            type: "post",
+            data: {
+                goodsId: goodsId,
+                content: content,
+                orderId: orderId
+            },
+            resultType: "json",
+            success: function (response) {
+                if (response.code === 0){
+                    layui.layer.msg(response.msg,{icon:1,time:1500});
+                    history.go(0)
+                }else {
+                    layui.layer.msg(response.msg,{icon:2,time:1500});
+                    $("#logoutBtn").attr("disabled",false);
+                }
+            }
+        });
+    })
+</script>
+
+</body>
+</html>

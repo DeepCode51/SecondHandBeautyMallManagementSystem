@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>订单详情</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/staticRes/layui/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/staticRes/layui/css/public.css}" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form">
+    <input type="text" name="goodsId" th:value="${orderDetailVo.orderId}" hidden>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">订单价格</label>
+        <div class="layui-input-block">
+            <input type="text" name="goodsName" lay-verify="required" disabled  th:value="${orderDetailVo.totalAmount}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">订单状态</label>
+        <div class="layui-input-block">
+            <input type="text" name="goodDesc" lay-verify="required" disabled th:value="${orderDetailVo.orderStatusStr}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">收货人</label>
+        <div class="layui-input-block">
+            <input type="text" name="price" lay-verify="required" disabled th:value="${orderDetailVo.deliveryName}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">联系方式</label>
+        <div class="layui-input-block">
+            <input type="text" name="price" lay-verify="required" disabled th:value="${orderDetailVo.deliveryPhone}" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">收货地址</label>
+        <div class="layui-input-block">
+            <input type="text" name="price" lay-verify="required" disabled th:value="${orderDetailVo.deliveryAddress}" class="layui-input">
+        </div>
+    </div>
+    <div th:each="item : ${orderDetailVo.list}">
+        <div class="layui-form-item">
+            <label class="layui-form-label required">商品名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="price" lay-verify="required" disabled th:value="${item.goodsName}" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">商品数量</label>
+            <div class="layui-input-block">
+                <input type="text" name="price" lay-verify="required" disabled th:value="${item.goodsCount}" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">商品价格</label>
+            <div class="layui-input-block">
+                <input type="text" name="price" lay-verify="required" disabled th:value="${item.price}" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-upload">
+            <label class="layui-form-label required">商品封面</label>
+            <div class="layui-upload-list">
+                <img style="width: 100px; height: 100px" class="layui-upload-img" th:src="@{'/mzmall/img/cover/' + ${item.goodsCover}}">
+                <p id="demoText"></p>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:src="@{/staticRes/front/js/jquery-1.12.4.min.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/layui/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+</body>
+</html>

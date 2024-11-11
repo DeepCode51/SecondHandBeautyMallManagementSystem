@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>注册</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/public.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/login.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/layui/lib/layui-v2.6.3/css/layui.css}"/>
+</head>
+<body><!-------------------reg-------------------------->
+<div class="reg">
+    <form action="#" method="post"><h1><a href="index.html">东方学院二手美妆商场</a></h1>
+        <p>用户注册</p>
+        <p><input type="text" id="username" name="username" value="" placeholder="请输入昵称"></p>
+        <p><input type="text" id="name" name="name" value="" placeholder="请输入姓名"></p>
+        <p><input type="text" id="storeName" name="storeName" value="" placeholder="请输入店铺名称"></p>
+        <p><input type="text" id="phone" name="phone" value="" placeholder="请输入手机号"></p>
+        <p><input type="password" id="password" name="password" value="" placeholder="请输入密码"></p>
+        <!-- <p class="txtL txt"><input class="code" type="text" name="" value="" placeholder="验证码"><img
+                src="img/temp/code.jpg"></p> -->
+        <p><input type="submit" id="register" name="" value="注册"></p>
+        <!-- <p class="txtL txt">完成此注册，即表明您同意了我们的<a href="#">
+            <使用条款和隐私策略>
+        </a></p> -->
+        <p class="txt"><a th:href="@{/seller/login}"><span></span>已有账号登录</a></p>
+    </form>
+</div>
+<script th:src="@{/staticRes/front/js/jquery-1.12.4.min.js}"></script>
+<script th:src="@{/staticRes/layui/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:inline="javascript">
+    let contextPath = [[@{/}]];
+
+    $("#register").on("click",function () {
+        $("#register").attr("disabled", "disabled");
+        let username = $("#username").val();
+        let name = $("#name").val();
+        let phone = $("#phone").val();
+        let password = $("#password").val();
+        let storeName = $("#storeName").val();
+        if (username === ""){
+            layui.layer.msg("用户名不能为空",{icon:2,time:1500});
+            $("#register").attr("disabled",false);
+            return false;
+        }
+        let reg = /^[a-zA-Z]\w{4,15}$/;
+        if (reg.test(username) === false){
+            layui.layer.msg("字母开头，允许5-16字节，允许字母数字下划线组合",{icon:2,time:1500});
+            return false;
+        }
+        if (name === ""){
+            layui.layer.msg("姓名不能为空",{icon:2,time:1500});
+            $("#register").attr("disabled",false);
+            return false;
+        }
+        if (phone === ""){
+            layui.layer.msg("手机号不能为空",{icon:2,time:1500});
+            $("#register").attr("disabled",false);
+            return false;
+        }
+        let ph = /^1[3|4|5|7|8]\d{9}$/;
+        if (ph.test(phone) === false){
+            layui.layer.msg("手机号不正确",{icon:2,time:1500});
+            return false;
+        }
+        if (password == ""){
+            layui.layer.msg("密码不能为空",{icon:2,time:1500});
+            $("#register").attr("disabled",false);
+            return false;
+        }
+        if (password.length<8){
+            layui.layer.msg("密码长度不小于8位",{icon:2,time:1500});
+            $("#register").attr("disabled",false);
+            return false;
+        }
+        $.ajax({
+            url: contextPath+"seller/reg",
+            type: "post",
+            data: {
+                username: $("#username").val(),
+                name: $("#name").val(),
+                phone: $("#phone").val(),
+                password: $("#password").val(),
+                storeName: storeName
+            },
+            resultType: "json",
+            success: function (response) {
+                console.log(response)
+                if (response.code === 0){
+                    layui.layer.msg("注册成功，稍后跳转到登录页面",{icon:1,time:1500},function () {
+                        window.location.href="http://localhost:8080/seller/login";
+                    });
+                }else {
+                    layui.layer.msg(response.msg, {icon:2,time:1500});
+                    $("#register").attr("disabled",false);
+                }
+            }
+        });
+        return false;
+    });
+</script>
+</body>
+</html>

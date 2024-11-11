@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xjr.mzmall.mapper.GoodsMapper">
+    <select id="getGoodsList" resultType="com.xjr.mzmall.vo.GoodsVo">
+        SELECT goods_id, goods_name, price,stock,
+        CASE new_level
+        WHEN 0 THEN '全新'
+        WHEN 1 THEN '95新'
+        WHEN 2 THEN '9新'
+        WHEN 3 THEN '85新'
+        WHEN 4 THEN '8新'
+        WHEN 5 THEN '7新'
+        WHEN 6 THEN '6新'
+        END as new_level,
+        CASE `status`
+        WHEN 0 THEN '上架中'
+        WHEN 1 THEN '已下架'
+        END as `status`, category_name
+        FROM
+            (
+                SELECT goods_id, goods_name, price,category_id,stock, new_level,`status`
+                FROM goods
+                WHERE store_id = (SELECT id FROM store WHERE user_id = #{ew.userId})
+                <if test="ew.goodsName != null and ew.goodsName !=''">
+                    and goods_name like concat('%',#{ew.goodsName},'%')
+                </if>
+                <if test="ew.categoryId != null">
+                    and category_id = #{ew.categoryId}
+                </if>
+                <if test="ew.newLevel != null">
+                    and new_level = #{ew.newLevel}
+                </if>
+                <if test="ew.status != null">
+                    and status = #{ew.status}
+                </if>
+            ) as t1
+        LEFT JOIN
+            category ON t1.category_id = category.category_id
+    </select>
+
+    <select id="getGoodsList2" resultType="com.xjr.mzmall.vo.GoodsVo">
+        SELECT goods_id, goods_name, price,stock,
+        CASE new_level
+        WHEN 0 THEN '全新'
+        WHEN 1 THEN '95新'
+        WHEN 2 THEN '9新'
+        WHEN 3 THEN '85新'
+        WHEN 4 THEN '8新'
+        WHEN 5 THEN '7新'
+        WHEN 6 THEN '6新'
+        END as new_level,
+        CASE `status`
+        WHEN 0 THEN '上架中'
+        WHEN 1 THEN '已下架'
+        END as `status`, category_name
+        FROM
+        (
+        SELECT goods_id, goods_name, price,category_id,stock, new_level,`status`
+        FROM goods
+        <where>
+            <if test="ew.goodsName != null and ew.goodsName !=''">
+                and goods_name like concat('%',#{ew.goodsName},'%')
+            </if>
+            <if test="ew.categoryId != null">
+                and category_id = #{ew.categoryId}
+            </if>
+            <if test="ew.newLevel != null">
+                and new_level = #{ew.newLevel}
+            </if>
+            <if test="ew.status != null">
+                and status = #{ew.status}
+            </if>
+        </where>
+        ) as t1
+        LEFT JOIN
+        category ON t1.category_id = category.category_id
+    </select>
+
+    <select id="randomGetGoods" resultType="com.xjr.mzmall.entity.Goods">
+        select goods_id, price, cover,good_desc, goods_name from
+        goods where `status` = 0 order by rand() limit #{num}
+    </select>
+
+    <select id="getGoodsCount" resultType="int">
+        SELECT count(goods_id) FROM goods WHERE store_id =
+        (
+        SELECT id FROM store WHERE user_id = #{userId}
+        )
+        AND `status` = 0
+    </select>
+
+    <select id="getGoodsFiveDo" resultType="com.xjr.mzmall.DO.GoodsTopFiveDo">
+        SELECT t1.*,goods.goods_name FROM
+        (
+        SELECT sum(goods_count) AS total_count,goods_id FROM order_detail WHERE goods_id IN(
+        SELECT goods_id FROM goods WHERE store_id = #{storeId}
+        )
+        AND create_time &gt;= #{beginTime} AND create_time &lt; #{endTime}
+        GROUP BY goods_id
+        ORDER BY total_count DESC LIMIT 5
+        ) AS t1
+        LEFT JOIN
+        goods
+        ON t1.goods_id = goods.goods_id
+    </select>
+
+    <select id="getGoodsCountByGoodsId" resultType="integer">
+        SELECT sum(goods_count) FROM order_detail WHERE goods_id = #{goodsId}
+        AND date_format(create_time,'%Y-%m-%d') = #{time}
+    </select>
+</mapper>

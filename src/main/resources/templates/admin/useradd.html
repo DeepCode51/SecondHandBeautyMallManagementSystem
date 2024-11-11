@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>东方学院二手美妆商场</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/staticRes/layui/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/staticRes/layui/css/public.css}" media="all">
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<div class="layui-form layuimini-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">账号</label>
+        <div class="layui-input-block">
+            <input type="text" name="username" lay-verify="required" lay-reqtext="账号不能为空" placeholder="请输入账号" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">手机</label>
+        <div class="layui-input-block">
+            <input type="text" name="phone" lay-verify="required" lay-reqtext="手机不能为空" placeholder="请输入手机" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">邮箱</label>
+        <div class="layui-input-block">
+            <input type="text" name="email" lay-verify="required" lay-reqtext="邮箱不能为空" placeholder="请输入邮箱" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">地址</label>
+        <div class="layui-input-block">
+            <input type="text" name="address" lay-verify="required" lay-reqtext="地址不能为空" placeholder="请输入地址" value="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">角色</label>
+        <div class="layui-input-block">
+            <select name="role" lay-verify="required">
+                <option value="0">买家</option>
+                <option value="1">卖家</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button id="savebtn" class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+        </div>
+    </div>
+</div>
+<script th:src="@{/staticRes/layui/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:inline="javascript">
+    let contextPath = [[@{/}]];
+
+    layui.use(['form'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            $ = layui.$;
+
+        //监听提交
+        form.on('submit(saveBtn)', function (data) {
+            let url = contextPath + 'admin/createUser';
+            console.log(data.field.username);
+            let username = data.field.username;
+            let email = data.field.email;
+            let phone = data.field.phone;
+            let atpos = email.indexOf("@");
+            let dotpos = email.lastIndexOf(".");
+            if (atpos<1 || dotpos<atpos+2 || dotpos+2>=email.length){
+                layui.layer.msg("不是一个有效的 e-mail 地址",{icon:2,time:1500});
+                return false;
+            }
+            let ph = /^1[3|4|5|7|8]\d{9}$/;
+            if (ph.test(phone) === false){
+                layui.layer.msg("手机号不正确",{icon:2,time:1500});
+                return false;
+            }
+            let reg = /^[a-zA-Z]\w{4,15}$/;
+            if (reg.test(username) === false){
+                layui.layer.msg("字母开头，允许5-16字节，允许字母数字下划线组合",{icon:2,time:1500});
+                return false;
+            }
+            $.post(url,data.field,function (response) {
+                $("#savebtn").attr('disabled','disabled').addClass("layui-btn-disabled")
+                if (response.code == 0){
+                    layer.msg(response.msg,{icon:1,time: 1000},function () {
+                        parent.reset();
+                        var iframeIndex = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(iframeIndex);
+                    })
+                }else{
+                    layer.msg(response.msg,{icon:2,anim:6})
+                    $("#savebtn").removeClass("layui-btn-disabled").removeAttr('disabled','disabled')
+                }
+            })
+
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xjr.mzmall.mapper.OrderReturnApplyMapper">
+    <select id="getReturnApplyDo" resultType="com.xjr.mzmall.DO.ReturnApplyDo">
+        SELECT t1.order_id, `user`.username, total_amount, return_reason, handle_note,status FROM
+        (
+        SELECT user_id,order_id,total_amount,return_reason, handle_note,create_time,status FROM order_return_apply
+        <where>
+            <if test="orderId != null">
+                order_id = #{orderId}
+            </if>
+            <if test="storeId != null">
+                AND store_id = #{storeId}
+            </if>
+        </where>
+        order by create_time desc
+        ) AS t1
+        INNER JOIN
+        `user` ON t1.user_id = `user`.user_id
+    </select>
+</mapper>

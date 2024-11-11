@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="utf-8"/>
+    <title>order</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/public.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/proList.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/mygxin.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/layui/lib/layui-v2.6.3/css/layui.css}"/>
+</head>
+<body>
+<!----------------------------------------order------------------>
+<div class="head ding" th:replace="buyer/common :: headerforuserinfo"></div>
+<div class="order cart">
+    <!-----------------site------------------->
+    <div class="site">
+        <p class="wrapper clearfix">
+            <span class="fl">订单确认</span>
+        </p>
+    </div>
+    <!-----------------orderCon------------------->
+    <div class="orderCon wrapper clearfix">
+        <div class="orderL fl">
+            <!--------h3---------------->
+            <h3>收件信息</h3>
+            <!--------addres---------------->
+            <div class="addres clearfix">
+                <div class="addre fl on" th:if="${session.user.address != ''}">
+                    <div class="tit clearfix">
+                        <p class="fl" id="userName"th:text="${session.user.name}"></p>
+                    </div>
+                    <div class="addCon">
+                        <p id="userAddress" th:text="${session.user.address}"></p>
+                        <p id="userPhone" th:text="${session.user.phone}"></p>
+                    </div>
+                </div>
+                <div class="addre fl on" th:if="${session.user.address == ''}">
+                    暂无收货地址
+                </div>
+            </div>
+            <h3>支付方式</h3>
+            <!--------way---------------->
+            <div class="way clearfix">
+                <img class="on" th:src="@{/staticRes/front/img/temp/way01.jpg}">
+                <img th:src="@{/staticRes/front/img/temp/way02.jpg}">
+                <img th:src="@{/staticRes/front/img/temp/way03.jpg}">
+            </div>
+            <h3>收货方式</h3>
+            <!--------dis---------------->
+            <div class="dis clearfix">
+                <span class="on" id="getByOther">送货上门</span>
+                <span id="getBySelf">自提</span>
+            </div>
+        </div>
+        <div class="orderR fr">
+            <div class="msg">
+                <h3>订单内容
+                    <a th:href="@{/mzmall/tocart}" class="fr">返回购物车</a>
+                </h3>
+                <!--------ul---------------->
+                <ul class="clearfix" th:each="goods : ${melOrderVo.list}">
+                    <li class="fl">
+                        <img style="width: 87px; height: 87px;" th:src="@{'/mzmall/img/cover/' + ${goods.cover}}">
+                    </li>
+                    <li class="fl">
+                        <p th:text="${goods.goodsName}"></p>
+                        <p th:text="'数量：' + ${goods.count}"></p>
+                    </li>
+                    <li class="fr" th:text="'￥' + ${goods.price}"></li>
+                </ul>
+            </div>
+            <!--------tips---------------->
+            <div class="tips">
+                <p>
+                    <span class="fl">商品金额：</span>
+                    <span class="fr" th:text="'￥' + ${melOrderVo.goodsTotalAmount}"></span>
+                </p>
+<!--                <p>-->
+<!--                    <span class="fl">优惠金额：</span>-->
+<!--                    <span class="fr">￥0.00</span> -->
+<!--                </p>-->
+                <p>
+                    <span class="fl">运费：</span>
+                    <span class="fr" id="freight">￥3.00</span>
+                </p>
+            </div>
+            <!--------tips count---------------->
+            <div class="count tips">
+                <p>
+                    <span class="fl">合计：</span>
+                    <span class="fr" id="totalAmount" th:text="'￥' + ${melOrderVo.totalAmount}"></span>
+                </p>
+            </div>
+            <input type="text" id="orderid" th:value="${melOrderVo.orderIds}" hidden>
+            <!--<input type="button" name="" value="去支付">-->
+            <a href="#" class="pay" id="payBtn">去支付</a>
+            <a style="margin-top: 8px;" href="#" id="cancelOrderBtn" class="pay">取消订单</a>
+        </div>
+    </div>
+</div>
+<!--编辑弹框-->
+<!--遮罩-->
+<div class="mask"></div>
+<!--返回顶部-->
+<div class="gotop" th:replace="buyer/common :: rightTool"></div>
+<!--footer-->
+<div class="footer" th:replace="buyer/common :: footer"></div>
+
+<script th:src="@{/staticRes/front/js/jquery-1.12.4.min.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/layui/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/public.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/pro.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/user.js}" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript" th:inline="javascript">
+    let contextPath = [[@{/}]];
+
+
+
+    $('#getBySelf').click(function () {
+        $('#freight').text('免运费')
+        let totalAmountStr = $('#totalAmount').text()
+        totalAmountStr = totalAmountStr.substring(1)
+        let totalAmount = parseFloat(totalAmountStr)
+        totalAmount = totalAmount - 3
+        $('#totalAmount').text('￥' + totalAmount)
+    });
+
+    $('#getByOther').click(function () {
+        $('#freight').text('￥3.00')
+        let totalAmountStr = $('#totalAmount').text()
+        totalAmountStr = totalAmountStr.substring(1)
+        let totalAmount = parseFloat(totalAmountStr)
+        totalAmount = totalAmount + 3
+        $('#totalAmount').text('￥' + totalAmount)
+    })
+
+    let payBtnIsClick = true
+    $('#payBtn').click(function () {
+        // alert('点击了去支付按钮')
+        // 需要的参数 订单编号
+        if (!payBtnIsClick) {
+            return
+        }
+        payBtnIsClick = false
+        // 需要判断用户是否存在收货地址
+        let userAddress = $('#userAddress').text()
+        console.log(userAddress)
+        if (userAddress == null || userAddress == '') {
+            layui.layer.msg("请先填写收货地址", {icon:2,time:1500});
+            setTimeout(() => {
+                window.location.href="http://localhost:8080/mzmall/address.html";
+            }, 1500)
+            buyNowIsClick = true
+            return;
+        }
+        let orderIds = $('#orderid').val()
+        let fre = $('#freight').text()
+        if (fre == '￥3.00') {
+            fre = 1
+        }
+        console.log(fre)
+        $.ajax({
+            url: contextPath+"mzmall/user/paymu/"+orderIds+"/"+fre,
+            type: "post",
+            resultType: "json",
+            success: function (response) {
+                console.log(response)
+                if (response.code === 0){
+                    // 成功就返回到订单详情页面进行支付
+                    window.location.href="http://localhost:8080/mzmall/took";
+                }else {
+                    layui.layer.msg(response.msg, {icon:2,time:1500});
+                }
+                buyNowIsClick = true
+            }
+        });
+    })
+
+    $('#cancelOrderBtn').click(function () {
+        let orderId = $('#orderid').val()
+        $.ajax({
+            url: contextPath+"mzmall/user/cancelOrder/"+orderId,
+            type: "post",
+            resultType: "json",
+            success: function (response) {
+                console.log(response)
+                if (response.code === 0){
+                    // 成功就回到订单页面
+                    window.location.href="http://localhost:8080/mzmall/myorder";
+                }else {
+                    layui.layer.msg(response.msg, {icon:2,time:1500});
+                }
+            }
+        });
+    })
+</script>
+
+
+</body>
+</html>

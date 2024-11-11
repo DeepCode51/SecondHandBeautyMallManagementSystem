@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>东方学院二手美妆商场</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/public.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/staticRes/front/css/proList.css}"/>
+</head>
+<body><!------------------------------head------------------------------>
+<div class="head" th:replace="buyer/common :: header"></div>
+<!-----------------address------------------------------->
+<div class="address">
+    <div class="wrapper clearfix">
+        <a th:href="@{/mzmall/index}">首页</a>
+        <span>/</span>
+        <a th:href="@{'/mzmall/searchbycategory/' + ${category.categoryId}}" th:text="${category.categoryName}"></a>
+        <span>/</span>
+        <a href="#" class="on" th:text="${goods.goodsName}"></a>
+    </div>
+</div><!-----------------------Detail------------------------------>
+<div class="detCon">
+    <div class="proDet wrapper">
+        <div class="proCon clearfix">
+            <div class="proImg fl">
+                <img class="det" style="width: 550px; height: 450px;" th:src="@{'/mzmall/img/cover/' + ${goods.cover}}"/>
+                <div class="smallImg clearfix">
+                    <img th:each="img : ${goods.detailImgList}" th:src="@{'/mzmall/img/showimg/' + ${img}}" th:attr="data-src=@{'/mzmall/img/showimg/' + ${img}}">
+                </div>
+            </div>
+            <div class="fr intro">
+                <div class="title">
+                    <input type="text" name="goodId" id="goodId" th:value="${goods.goodsId}" hidden>
+                    <h4 th:text="${goods.goodsName}"></h4>
+                    <p th:text="${goods.goodDesc}"></p>
+                    <span th:text="'￥' + ${goods.price}"></span>
+                </div>
+                <div class="proIntro">
+                    <p>数量&nbsp;&nbsp;库存<span id="goodsStock" th:text="${goods.stock}"></span>件</p>
+                    <div class="num clearfix">
+                        <img class="fl sub" th:src="@{/staticRes/front/img/temp/sub.jpg}" id="subBtn">
+                        <span class="fl" id="curCount" contentEditable="true">1</span>
+                        <img class="fl add" th:src="@{/staticRes/front/img/temp/add.jpg}" id="addBtn">
+                        <p class="please fl">请选择商品属性!</p>
+                    </div>
+                </div>
+                <div class="btns clearfix">
+                    <a href="#2" id="buyNow">
+                        <p class="buy fl">立即购买</p>
+                    </a>
+                    <a href="#2" id="shoppingCart">
+                        <p class="cart fr">加入购物车</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="introMsg wrapper clearfix">
+    <div class="msgL fl">
+        <div class="msgTit clearfix">
+            <a class="on">商品详情</a>
+            <a>所有评价</a></div>
+        <div class="msgAll">
+            <div class="msgImgs">
+                <img style="width: 940px; height: 696px;" th:each="img : ${goods.detailImgList}" th:src="@{'/mzmall/img/showimg/' + ${img}}">
+            </div>
+            <div class="eva">
+                <div class="per clearfix" th:each="item : ${comments}">
+                    <img class="fl" style="width: 40px; height: 40px; border-radius: 50%;" th:src="@{'/mzmall/img/avatar/' + ${item.userCover}}">
+                    <div class="perR fl">
+                        <p th:text="${item.userName}">馨***呀</p>
+                        <p th:text="${item.content}">不好意思评价晚了，产品很好，价格比玻璃品便宜，没有我担心的杂色，发货快，包装好，全5分</p>
+                        <p><span th:text="${item.createTime}">2016年12月27日08:31</span></p>
+                    </div>
+                    <div style="margin-left: 25px;" th:each="ite : ${item.list}">
+                        <img class="fl" style="width: 40px; height: 40px; border-radius: 50%;" th:src="@{'/mzmall/img/avatar/' + ${ite.userCover}}">
+                        <div class="perR fl">
+                            <p th:text="${ite.userName}">馨***呀</p>
+                            <p th:text="${ite.content}">不好意思评价晚了，产品很好，价格比玻璃品便宜，没有我担心的杂色，发货快，包装好，全5分</p>
+                            <p><span th:text="${ite.createTime}">2016年12月27日08:31</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="msgR fr">
+        <h4>为你推荐</h4>
+        <div class="seeList" th:each="goodsList : ${recommendGoods}">
+            <a th:each="item : ${goodsList}" th:href="@{'/mzmall/detail?goodsid=' + ${item.goodsId}}" >
+                <dl>
+                    <dt><img style="width: 161px; height: 243px;" th:src="@{'/mzmall/img/cover/' + ${item.cover}}"></dt>
+                    <dd th:text="${item.goodsName}"></dd>
+                    <dd th:text="'￥' + ${item.price}"></dd>
+                </dl>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="like">
+    <h4>猜你喜欢</h4>
+    <div class="bottom">
+        <div class="hd">
+            <span class="prev">
+                <img th:src="@{/staticRes/front/img/temp/prev.png}">
+            </span>
+            <span class="next">
+                <img th:src="@{/staticRes/front/img/temp/next.png}">
+            </span>
+        </div>
+        <div class="imgCon bd">
+            <div class="likeList clearfix">
+                <div style="display: flex; justify-content: space-between;" th:each="goodsList : ${guessYouWillLikeGoods}">
+                    <a style="margin-right: 8px" th:each="item : ${goodsList}" th:href="@{'/mzmall/detail?goodsid=' + ${item.goodsId}}">
+                        <dl>
+                            <dt><img style="width: 300px; height: 300px;" th:src="@{'/mzmall/img/cover/' + ${item.cover}}"></dt>
+                            <dd th:text="${item.goodsName}"></dd>
+                            <dd th:text="'￥' + ${item.price}"></dd>
+                        </dl>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!--返回顶部-->
+<div class="gotop" th:replace="buyer/common :: rightTool"></div>
+<div class="msk"></div>
+<!--footer-->
+<div class="footer" th:replace="buyer/common :: footer"></div>
+
+<script th:src="@{/staticRes/front/js/jquery-1.12.4.min.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/jquery.SuperSlide.2.1.1.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/layui/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/public.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/nav.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/pro.js}" type="text/javascript" charset="utf-8"></script>
+<script th:src="@{/staticRes/front/js/cart.js}" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" th:inline="javascript">
+    let contextPath = [[@{/}]];
+
+    jQuery(".bottom").slide({
+        titCell: ".hd ul",
+        mainCell: ".bd .likeList",
+        autoPage: true,
+        autoPlay: false,
+        effect: "leftLoop",
+        autoPlay: true,
+        vis: 1
+    });
+
+    $('#subBtn').click(function () {
+        let curCount = $('#curCount').text()
+        if (curCount > 1) {
+            curCount = curCount - 1
+            $('#curCount').text(curCount)
+        }else {
+            alert('挑选商品数量不能小于1')
+        }
+    })
+
+    $('#addBtn').click(function () {
+        let goodsStock = $('#goodsStock').text()
+        let curCount = $('#curCount').text()
+        if (curCount < goodsStock) {
+            curCount = parseInt(curCount) + 1
+            $('#curCount').text(curCount)
+        } else {
+            alert('挑选商品数量不能超过库存')
+        }
+    })
+
+    let shoppingCartIsCanClick = true
+
+    $('#shoppingCart').click(function () {
+        // 判断库存是否有存余 直接判断该商品是否在购物车中
+        // alert('点击了加入购物车')
+        if (!shoppingCartIsCanClick) {
+            return
+        }
+        shoppingCartIsCanClick = false
+        let curCount = $('#curCount').text()
+        let goodId = $('#goodId').val()
+        $.ajax({
+            url: contextPath+"mzmall/user/addshoppingcart/"+goodId+"/"+curCount,
+            type: "post",
+            resultType: "json",
+            success: function (response) {
+                console.log(response)
+                if (response.code === 0){
+                    layui.layer.msg("成功加入购物车",{icon:1,time:1500});
+                }else {
+                    layui.layer.msg(response.msg, {icon:2,time:1500});
+                }
+                shoppingCartIsCanClick = true
+            }
+        });
+    })
+
+    let buyNowIsClick = true
+    $('#buyNow').click(function () {
+        // 点击立即购买会挑转到订单确认页面 这时候就创建一个订单
+        // 需要的参数 商品id 购买的数量
+        if (!buyNowIsClick) {
+            return
+        }
+        buyNowIsClick = false
+        let curCount = $('#curCount').text()
+        let goodId = $('#goodId').val()
+        $.ajax({
+            url: contextPath+"mzmall/user/createneworder/"+goodId+"/"+curCount,
+            type: "post",
+            resultType: "json",
+            success: function (response) {
+                console.log(response)
+                if (response.code === 0){
+                    // 成功就返回到订单详情页面进行支付
+                    window.location.href="http://localhost:8080/mzmall/topaypage/"+response.data;
+                }else {
+                    layui.layer.msg(response.msg, {icon:2,time:1500});
+                }
+                buyNowIsClick = true
+            }
+        });
+    })
+</script>
+</body>
+</html>

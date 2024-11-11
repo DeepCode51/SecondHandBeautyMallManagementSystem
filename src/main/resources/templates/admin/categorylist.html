@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>分类列表</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/staticRes/layui/lib/layui-v2.6.3/css/layui.css}" media="all">
+    <link rel="stylesheet" th:href="@{/staticRes/layui/css/public.css}" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">分类名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="categoryName" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button id="research" type="submit" class="layui-btn layui-btn-primary"  lay-submit lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索</button>
+                        </div>
+                        <div class="layui-inline">
+                            <button id="refresh" onclick="reset()" type="submit" class="layui-btn layui-btn-primary"><i class="layui-icon layui-icon-refresh"></i> 刷 新</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <script type="text/html" id="toolbarDemo">
+            <div class="layui-btn-container">
+                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加 </button>
+                <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除 </button>
+            </div>
+        </script>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
+        <script type="text/html" id="currentTableBar">
+            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="edit"> 修改 </a>
+            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete"> 删除 </a>
+        </script>
+
+    </div>
+</div>
+<script th:src="@{/staticRes/layui/lib/jquery-3.4.1/jquery-3.4.1.min.js}" charset="utf-8"></script>
+<script th:src="@{/staticRes/layui/lib/layui-v2.6.3/layui.js}" charset="utf-8"></script>
+<script th:inline="javascript">
+    function reset(){
+        $('input').attr("value","");
+        $('#isValid').val("");
+        refresh();
+    }
+
+    function refresh(){
+        $('#research').click();
+    }
+
+
+
+    let contextPath = [[@{/}]];
+
+
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+
+        table.render({
+            elem: '#currentTableId',
+            url: contextPath+'admin/categorylist',
+            toolbar: '#toolbarDemo',
+            cellMinWidth: 80,
+            defaultToolbar: ['filter', 'exports', 'print', {
+                title: '提示',
+                layEvent: 'LAYTABLE_TIPS',
+                icon: 'layui-icon-tips'
+            }],
+            cols: [
+                [
+                {type: "checkbox", width: 50},
+                {field: 'categoryId', width: 80, title: 'ID', sort: true},
+                {field: 'categoryName', width: 120, title: '账号'},
+                {title: '操作', toolbar: '#currentTableBar', align: "center"}
+            ]
+            ],
+            limits: [10, 15, 20, 25, 50, 100],
+            limit: 10,
+            page: true,
+            skin: 'line'
+        });
+
+        // 监听搜索操作
+        form.on('submit(data-search-btn)', function (data) {
+            // var result = JSON.stringify(data.field);
+            // layer.alert(result, {
+            //     title: '最终的搜索信息'
+            // });
+            // console.log(data.field);
+            //执行搜索重载
+            table.reload('currentTableId', {
+                page: {
+                    curr: 1
+                }
+                , where: {
+                    categoryName: data.field.categoryName
+                }
+            }, 'data');
+
+            return false;
+        });
+
+        /**
+         * toolbar监听事件
+         */
+        table.on('toolbar(currentTableFilter)', function (obj) {
+            if (obj.event === 'add') {  // 监听添加操作
+                var index = layer.open({
+                    title: '添加分类',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['50%', '30%'],
+                    content: contextPath+'admin/categoryadd.html',
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+            } else if (obj.event === 'delete') {  // 监听删除操作
+                var checkStatus = table.checkStatus('currentTableId')
+                    , data = checkStatus.data;
+                if (data.length == 0 ){
+                    layer.alert('您未选中任何数据', {icon: 2, anim: 6, title: '警告'});
+                    return false;
+                }
+                var idarr = new Array();
+                $(data).each(function () {
+                    idarr.push(this.categoryId)
+                })
+                layer.confirm('确认删除这些数据?', {icon: 3, title: '删除确认'}, function (index) {
+                    var url = contextPath + 'admin/deleteCategory/' + idarr.join(',');
+                    $.post(url, function (response) {
+                        if (response.code === 0){
+                            layer.msg(response.msg, {icon: 1, time: 1500});
+                            reset();
+                        }else {
+                            layer.msg(response.msg, {icon: 2, anim: 6});
+                        }
+                    });
+                    layer.close(index);
+                });
+            }
+        });
+
+        //监听表格复选框选择
+        table.on('checkbox(currentTableFilter)', function (obj) {
+            console.log(obj)
+        });
+
+        table.on('tool(currentTableFilter)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'edit') {
+
+                var index = layer.open({
+                    title: '修改分类',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin:true,
+                    shadeClose: true,
+                    area: ['50%', '30%'],
+                    content: contextPath+'admin/tocategoryupdate.html?categoryid='+data.categoryId,
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+                return false;
+            } else if (obj.event === 'delete') {
+                layer.confirm('真的删除行么', function (index) {
+                    console.log(data.userId)
+                    var url = contextPath + 'admin/deleteCategory/' + data.categoryId;
+                    $.post(url, function (response) {
+                        if (response.code == 0){
+                            layer.msg(response.msg, {icon: 1, time: 1500});
+                            reset();
+                        }else {
+                            layer.msg(response.msg, {icon: 2, anim: 6});
+                        }
+                    });
+                    layer.close(index);
+                });
+            }
+        });
+
+    });
+</script>
+
+</body>
+</html>
